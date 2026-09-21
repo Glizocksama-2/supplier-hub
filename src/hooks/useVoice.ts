@@ -275,7 +275,7 @@ export function useElevenLabsTTS() {
   const [isSpeaking, setIsSpeaking] = useState(false)
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
-  const speak = useCallback(async (text: string, voiceId: string = 'EXAVITQu4vr4xnSDxMaL') => {
+  const speak = useCallback(async (text: string, voiceId: string = 'hpp4J3VqNfWAUOO0d1Us') => {
     if (isSpeaking) return
 
     try {
