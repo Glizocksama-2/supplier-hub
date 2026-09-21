@@ -24,11 +24,13 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
   const [isSpeaking, setIsSpeaking] = useState(false)
   const [status, setStatus] = useState<'IDLE' | 'LISTENING' | 'PARSING' | 'SYNTHESIZING'>('IDLE')
   const [manualCommand, setManualCommand] = useState('')
+  const [speechError, setSpeechError] = useState<'network' | 'not-allowed' | 'other' | null>(null)
 
   const recognitionRef = useRef<any>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const silenceTimerRef = useRef<any>(null)
   const transcriptRef = useRef<string>('')
+  const inputRef = useRef<HTMLInputElement | null>(null)
 
   const speakWithBrowserSpeech = useCallback((text: string) => {
     if (typeof window === 'undefined') return
@@ -276,6 +278,7 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
     setTranscript('')
     transcriptRef.current = ''
     setResponseMessage('')
+    setSpeechError(null)
 
     if (typeof window === 'undefined') return
 
@@ -295,6 +298,7 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
         stream.getTracks().forEach((track) => track.stop())
       } catch (err: any) {
         console.warn('Microphone permission check failed:', err)
+        setSpeechError('not-allowed')
         setResponseMessage(
           'Microphone permission blocked or device unavailable. Allow microphone in your browser address bar.'
         )
@@ -367,11 +371,14 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
       const err = event?.error
 
       if (err === 'not-allowed' || err === 'service-not-allowed') {
+        setSpeechError('not-allowed')
         setResponseMessage('Microphone access blocked. Click the lock/settings icon in the browser address bar to allow.')
       } else if (err === 'network') {
+        setSpeechError('network')
         setResponseMessage(
-          'Browser speech cloud blocked by network or browser privacy setting (common in Brave/Edge). Type any command in the prompt below or tap the quick macros to speak!'
+          'Browser speech cloud blocked by network or browser privacy setting (common in Brave/Edge). Type any command below or tap the quick macros to speak!'
         )
+        setTimeout(() => inputRef.current?.focus(), 150)
       } else if (err === 'language-not-supported') {
         console.warn('Language not supported, retrying with en-US fallback')
         recognition.lang = 'en-US'
@@ -384,6 +391,7 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
           setResponseMessage('No voice activity detected. Speak into your microphone, type below, or tap a macro.')
         }
       } else if (err === 'audio-capture') {
+        setSpeechError('not-allowed')
         setResponseMessage('No microphone hardware detected. Please connect an audio input device.')
       } else {
         if (!transcriptRef.current) {
@@ -416,6 +424,7 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
   }
 
   const triggerSample = (phrase: string) => {
+    setSpeechError(null)
     setTranscript(phrase)
     processCommand(phrase)
   }
@@ -521,6 +530,56 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
             )}
           </button>
 
+          {/* Direct 1-Tap Voice Audio Test Buttons (Instant Neural Audio Playback) */}
+          <div className="w-full mt-2 grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => triggerSample('Who is cheaper and faster for maize?')}
+              className="py-2 px-3 bg-[#101726] hover:bg-[#162238] border border-blue-600/60 hover:border-blue-500 text-blue-300 font-bold text-[10px] uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors"
+            >
+              <Volume2 className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+              <span className="truncate">▶ PLAY BELLA: SOURCING RADAR</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => triggerSample('Order 50kg maize from cheapest supplier')}
+              className="py-2 px-3 bg-[#111318] hover:bg-[#181a22] border border-[#262834] hover:border-blue-500 text-white font-bold text-[10px] uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors"
+            >
+              <Volume2 className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+              <span className="truncate">▶ PLAY BELLA: REQUISITION</span>
+            </button>
+          </div>
+
+          {/* Dedicated Brave / Edge Speech Diagnosis Card */}
+          {speechError === 'network' && (
+            <div className="w-full mt-3 p-3 bg-[#0d111a] border border-blue-600/80 text-left font-mono">
+              <div className="flex items-center justify-between pb-1.5 border-b border-[#1e2330] mb-2">
+                <span className="text-xs font-bold text-white flex items-center gap-1.5">
+                  <span className="w-2 h-2 bg-blue-500 rounded-full animate-ping" />
+                  BRAVE / EDGE PRIVACY SHIELD DETECTED
+                </span>
+                <span className="text-[10px] text-blue-400 font-mono">ERR: NET_SPEECH_BLOCKED</span>
+              </div>
+              <p className="text-[11px] text-[#9ca3af] mb-2 leading-relaxed">
+                Brave blocks Google Speech Cloud recognition by default. To enable your microphone:
+              </p>
+              <div className="bg-[#050608] p-2 border border-[#222530] text-[11px] space-y-1 mb-2">
+                <div className="text-white">
+                  1. Open tab: <code className="text-blue-400 underline select-all bg-[#12151f] px-1 py-0.5">brave://settings/system</code>
+                </div>
+                <div className="text-white">
+                  2. Turn <strong className="text-blue-400">ON</strong>: "Use Google services for speech recognition"
+                </div>
+                <div className="text-[#9ca3af]">
+                  3. Refresh this page & tap microphone to stream speech!
+                </div>
+              </div>
+              <p className="text-[10px] text-blue-300">
+                ⚡ Or type any voice command in the box below and press Enter — Bella will synthesize audio immediately!
+              </p>
+            </div>
+          )}
+
           {/* Tactical Command Input (Guaranteed fallback for network or browser speech limitations) */}
           <form
             onSubmit={(e) => {
@@ -536,6 +595,7 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
             <div className="relative flex-1">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-500 font-bold text-xs">»</span>
               <input
+                ref={inputRef}
                 type="text"
                 value={manualCommand}
                 onChange={(e) => setManualCommand(e.target.value)}
