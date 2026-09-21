@@ -136,16 +136,53 @@ ALTER TABLE boda_assignments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE voice_commands ENABLE ROW LEVEL SECURITY;
 
+-- Security Definer helper functions to prevent RLS recursion
+CREATE OR REPLACE FUNCTION is_admin()
+RETURNS BOOLEAN
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public
+STABLE
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin'
+  );
+$$;
+
+CREATE OR REPLACE FUNCTION is_boda_rider_assigned(p_order_id UUID, p_rider_id UUID)
+RETURNS BOOLEAN
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public
+STABLE
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM boda_assignments
+    WHERE order_id = p_order_id AND boda_rider_id = p_rider_id
+  );
+$$;
+
+CREATE OR REPLACE FUNCTION is_order_party(p_order_id UUID, p_user_id UUID)
+RETURNS BOOLEAN
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public
+STABLE
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM orders
+    WHERE id = p_order_id AND (retailer_id = p_user_id OR supplier_id = p_user_id)
+  );
+$$;
+
 -- RLS Policies
 -- Profiles: users can read/update their own, admins can read all
 CREATE POLICY "Users can read own profile" ON profiles FOR SELECT USING (auth.uid() = id);
 CREATE POLICY "Users can update own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
-CREATE POLICY "Admins can read all profiles" ON profiles FOR SELECT USING (
-  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
-);
+CREATE POLICY "Admins can read all profiles" ON profiles FOR SELECT USING (is_admin());
 
--- Products: all authenticated can read
-CREATE POLICY "Authenticated can read products" ON products FOR SELECT USING (auth.role() = 'authenticated');
+-- Products: all can read catalog
+CREATE POLICY "Public can read products" ON products FOR SELECT USING (true);
 
 -- Retailer inventory: retailer owns their inventory
 CREATE POLICY "Retailer owns inventory" ON retailer_inventory FOR ALL USING (retailer_id = auth.uid());
@@ -156,16 +193,14 @@ CREATE POLICY "Retailers can view active listings" ON supplier_listings FOR SELE
 
 -- Orders: retailer/supplier/boda involved can read
 CREATE POLICY "Order participants can read" ON orders FOR SELECT USING (
-  retailer_id = auth.uid() OR supplier_id = auth.uid() OR 
-  EXISTS (SELECT 1 FROM boda_assignments WHERE order_id = orders.id AND boda_rider_id = auth.uid())
+  retailer_id = auth.uid() OR supplier_id = auth.uid() OR is_boda_rider_assigned(id, auth.uid())
 );
 CREATE POLICY "Retailer can create orders" ON orders FOR INSERT WITH CHECK (retailer_id = auth.uid());
 CREATE POLICY "Supplier can update own orders" ON orders FOR UPDATE USING (supplier_id = auth.uid());
 
 -- Boda assignments: boda rider or order participants
 CREATE POLICY "Boda can view assignments" ON boda_assignments FOR SELECT USING (
-  boda_rider_id = auth.uid() OR
-  EXISTS (SELECT 1 FROM orders WHERE id = boda_assignments.order_id AND (retailer_id = auth.uid() OR supplier_id = auth.uid()))
+  boda_rider_id = auth.uid() OR is_order_party(order_id, auth.uid())
 );
 CREATE POLICY "Boda can update own assignments" ON boda_assignments FOR UPDATE USING (boda_rider_id = auth.uid());
 
