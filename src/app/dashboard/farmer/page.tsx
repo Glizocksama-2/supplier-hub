@@ -2,16 +2,13 @@
 
 import { useState } from 'react'
 import {
-  Leaf,
   Sprout,
-  Package,
   Clock,
-  CheckCircle2,
-  Bike,
   Plus,
+  ArrowRight,
   TrendingUp,
   MapPin,
-  Calendar,
+  Terminal,
 } from 'lucide-react'
 import { useAppStore } from '@/store'
 import { DemoRoleSwitcher } from '@/components/DemoRoleSwitcher'
@@ -33,12 +30,10 @@ export default function FarmerDashboard() {
   const [newPrice, setNewPrice] = useState(60)
   const [newStock, setNewStock] = useState(400)
 
-  // Filter listings for this farmer
   const myListings = listings.filter(
     (l) => l.supplier_id === currentUser.id || l.supplier?.role === 'farmer'
   )
 
-  // Filter orders where supplier is farmer
   const myOrders = orders.filter(
     (o) => o.supplier_id === currentUser.id || o.supplier?.role === 'farmer'
   )
@@ -72,106 +67,99 @@ export default function FarmerDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex flex-col">
+    <div className="min-h-screen bg-[#0a0a0c] text-[#e2e2e8] tactical-grid font-mono flex flex-col selection:bg-[#d2ff00] selection:text-black">
       <DemoRoleSwitcher />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      <main className="flex-1 max-w-[1500px] w-full mx-auto px-4 sm:px-6 py-6 space-y-6">
         {/* Farmer Header */}
-        <div className="bg-gradient-to-r from-emerald-800 via-green-700 to-teal-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl shadow-emerald-900/10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="bg-[#0f0f14] border-2 border-[#262632] p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-semibold mb-3">
-              <Sprout className="w-3.5 h-3.5" />
-              <span>Direct Farm Portal (Zero Middleman)</span>
+            <div className="flex items-center gap-2 text-[10px] text-emerald-400 font-black tracking-wider uppercase mb-1">
+              <span className="w-2 h-2 bg-emerald-400 animate-pulse" />
+              <span>TERMINAL NODE // FARM_GATE_DIRECT_03</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight">{currentUser.business_name}</h1>
-            <p className="text-emerald-100 text-sm mt-1 flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-emerald-300" />
-              <span>{currentUser.address} • Contact: {currentUser.phone}</span>
+            <h1 className="text-2xl font-black text-white uppercase tracking-tight">
+              {currentUser.business_name}
+            </h1>
+            <p className="text-xs text-[#7d7d8c] mt-0.5">
+              LOC: {currentUser.address} • PHONE: {currentUser.phone}
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setIsAddModalOpen(true)}
-              className="px-4 py-2.5 rounded-xl bg-white text-emerald-900 font-bold text-xs flex items-center gap-2 shadow-sm hover:bg-emerald-50 transition-colors"
-            >
-              <Plus className="w-4 h-4 text-emerald-700" />
-              <span>Post New Farm Harvest</span>
-            </button>
-          </div>
+          <button
+            onClick={() => setIsAddModalOpen(true)}
+            className="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-black font-black text-xs uppercase tracking-wider flex items-center gap-2 transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            <span>[POST FRESH HARVEST LOT]</span>
+          </button>
         </div>
 
         {/* Metrics Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-xs">
-            <span className="text-xs text-gray-500 font-medium">Pending Farm Orders</span>
-            <p className="text-2xl font-black text-amber-600 mt-1">{pendingOrders.length}</p>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="p-4 bg-[#0e0e13] border border-[#22222a]">
+            <span className="text-[10px] text-[#777785] uppercase block font-bold">AWAITING PICKUP DISPATCH</span>
+            <p className="text-2xl font-black text-[#ff6b00] mt-1">{pendingOrders.length}</p>
           </div>
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-xs">
-            <span className="text-xs text-gray-500 font-medium">Harvest Lots Active</span>
-            <p className="text-2xl font-black text-emerald-600 mt-1">{myListings.length}</p>
+          <div className="p-4 bg-[#0e0e13] border border-[#22222a]">
+            <span className="text-[10px] text-[#777785] uppercase block font-bold">ACTIVE HARVEST LOTS</span>
+            <p className="text-2xl font-black text-emerald-400 mt-1">{myListings.length}</p>
           </div>
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-xs">
-            <span className="text-xs text-gray-500 font-medium">Delivered to Retailers</span>
-            <p className="text-2xl font-black text-green-600 mt-1">{completedOrders.length}</p>
+          <div className="p-4 bg-[#0e0e13] border border-[#22222a]">
+            <span className="text-[10px] text-[#777785] uppercase block font-bold">DIRECT DELIVERIES</span>
+            <p className="text-2xl font-black text-[#d2ff00] mt-1">{completedOrders.length}</p>
           </div>
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-xs">
-            <span className="text-xs text-gray-500 font-medium">Boda Network Reach</span>
-            <p className="text-2xl font-black text-teal-600 mt-1">40 km</p>
+          <div className="p-4 bg-[#0e0e13] border border-[#22222a]">
+            <span className="text-[10px] text-[#777785] uppercase block font-bold">BODA CARRIER REACH</span>
+            <p className="text-2xl font-black text-white mt-1">40 KM</p>
           </div>
         </div>
 
         {/* Pending Farm Orders */}
         {pendingOrders.length > 0 && (
-          <section className="space-y-4">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-amber-500 animate-ping" />
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                <Clock className="w-5 h-5 text-amber-500" />
-                Retailers Requesting Farm Produce ({pendingOrders.length})
-              </h2>
+          <section className="space-y-3">
+            <div className="flex items-center justify-between border-b border-emerald-500/30 pb-2">
+              <div className="flex items-center gap-2 text-xs font-black text-emerald-400 uppercase tracking-wider">
+                <Clock className="w-4 h-4 text-emerald-400" />
+                <span>KIOSK REQUISITIONS // AWAITING BODA HARVEST PICKUP ({pendingOrders.length})</span>
+              </div>
             </div>
 
-            <div className="grid gap-4">
+            <div className="grid gap-3">
               {pendingOrders.map((ord) => (
                 <div
                   key={ord.id}
-                  className="bg-emerald-50/50 dark:bg-emerald-950/20 border-2 border-emerald-400/50 rounded-2xl p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                  className="bg-[#0a120c] border-2 border-emerald-500 p-4 flex flex-col md:flex-row md:items-center justify-between gap-4"
                 >
-                  <div>
+                  <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-base text-gray-900 dark:text-white">
-                        Order #{ord.id}
-                      </span>
-                      <span className="text-xs font-semibold px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200">
-                        FARM PICKUP REQUEST
+                      <span className="text-sm font-black text-white">REQUISITION #{ord.id}</span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 bg-emerald-950 text-emerald-300 border border-emerald-800 uppercase">
+                        FARM GATE PICKUP
                       </span>
                     </div>
 
-                    <p className="text-sm font-semibold text-gray-800 dark:text-gray-200 mt-1">
+                    <p className="text-sm font-bold text-white">
                       {ord.retailer?.business_name || 'Retailer'}: {ord.quantity} {ord.product?.unit} {ord.product?.name}
                     </p>
-                    <p className="text-xs text-gray-500 mt-0.5">
-                      Delivery to: {ord.delivery_address}
+                    <p className="text-xs text-[#888894]">
+                      DESTINATION: {ord.delivery_address}
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-4 border-t md:border-t-0 md:border-l border-[#1a2d1d] pt-3 md:pt-0 md:pl-4">
                     <div className="text-right">
-                      <span className="text-lg font-black text-emerald-700 dark:text-emerald-400">
+                      <span className="text-[10px] text-[#777785] uppercase block">FARM GATE PAYOUT</span>
+                      <span className="text-lg font-black text-emerald-400">
                         KSh {ord.total_amount?.toLocaleString()}
-                      </span>
-                      <span className="text-xs text-gray-500 block">
-                        KSh {ord.unit_price}/{ord.product?.unit} (Farm Gate Price)
                       </span>
                     </div>
 
                     <button
                       onClick={() => supplierConfirmOrder(ord.id)}
-                      className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-5 rounded-xl text-xs flex items-center gap-2 shadow-sm transition-colors"
+                      className="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-black font-black text-xs uppercase tracking-wider transition-colors"
                     >
-                      <CheckCircle2 className="w-4 h-4" />
-                      <span>Ready for Boda Pickup</span>
+                      CONFIRM & DISPATCH BODA »
                     </button>
                   </div>
                 </div>
@@ -180,57 +168,57 @@ export default function FarmerDashboard() {
           </section>
         )}
 
-        {/* Farm Fresh Harvest Lots */}
-        <section className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl p-6 shadow-xs">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-gray-100 dark:border-gray-800">
-            <div>
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white">Harvest Inventory & Farm Gate Rates</h2>
-              <p className="text-xs text-gray-500">Fresh organic crops available directly for local kiosk owners</p>
-            </div>
+        {/* Harvest Lots Table */}
+        <section className="bg-[#0e0e13] border border-[#242430] p-5 space-y-4">
+          <div className="flex items-center justify-between border-b border-[#1c1c24] pb-3">
+            <h2 className="text-sm font-black text-white uppercase tracking-wider">
+              ACTIVE HARVEST LOTS // DIRECT FARM GATE RATES
+            </h2>
+            <span className="text-[10px] text-[#666675]">NO BROKER MARKUPS</span>
           </div>
 
-          <div className="overflow-x-auto mt-4">
-            <table className="w-full text-left text-sm">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
               <thead>
-                <tr className="text-xs uppercase text-gray-400 border-b border-gray-100 dark:border-gray-800">
-                  <th className="pb-3 font-semibold">Crop / Produce</th>
-                  <th className="pb-3 font-semibold">Category</th>
-                  <th className="pb-3 font-semibold">Farm Price</th>
-                  <th className="pb-3 font-semibold">Available Harvest</th>
-                  <th className="pb-3 font-semibold text-right">Update Harvest</th>
+                <tr className="text-[10px] text-[#666675] uppercase border-b border-[#20202a]">
+                  <th className="pb-2 font-bold">CROP</th>
+                  <th className="pb-2 font-bold">CATEGORY</th>
+                  <th className="pb-2 font-bold">FARM GATE RATE</th>
+                  <th className="pb-2 font-bold">HARVEST ON HAND</th>
+                  <th className="pb-2 font-bold text-right">CALIBRATE RATE</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+              <tbody className="divide-y divide-[#181820]">
                 {myListings.map((list) => (
-                  <tr key={list.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors">
-                    <td className="py-3.5 font-bold text-gray-900 dark:text-white">
+                  <tr key={list.id} className="hover:bg-[#14141c] transition-colors">
+                    <td className="py-3 font-bold text-white uppercase">
                       {list.product?.name}
                     </td>
-                    <td className="py-3.5 text-xs text-gray-500">{list.product?.category}</td>
-                    <td className="py-3.5">
-                      <span className="font-black text-emerald-600 dark:text-emerald-400">
+                    <td className="py-3 text-[11px] text-[#787884]">{list.product?.category}</td>
+                    <td className="py-3">
+                      <span className="font-black text-emerald-400 text-sm">
                         KSh {list.price_per_unit}
                       </span>
-                      <span className="text-xs text-gray-400">/{list.unit}</span>
+                      <span className="text-[10px] text-[#666675]">/{list.unit}</span>
                     </td>
-                    <td className="py-3.5 font-bold text-gray-700 dark:text-gray-300">
+                    <td className="py-3 font-bold text-white">
                       {list.available_stock} {list.unit}
                     </td>
-                    <td className="py-3.5 text-right">
-                      <div className="inline-flex items-center gap-1.5">
+                    <td className="py-3 text-right">
+                      <div className="inline-flex items-center gap-1">
                         <button
                           onClick={() =>
                             updateListing(list.id, { price_per_unit: Math.max(10, list.price_per_unit - 5) })
                           }
-                          className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-xs hover:bg-gray-200"
+                          className="px-2 py-0.5 bg-[#181820] hover:bg-[#262634] text-white border border-[#282836] text-[10px] font-bold"
                         >
-                          -5
+                          -5 KSH
                         </button>
                         <button
                           onClick={() => updateListing(list.id, { price_per_unit: list.price_per_unit + 5 })}
-                          className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-xs hover:bg-gray-200"
+                          className="px-2 py-0.5 bg-[#181820] hover:bg-[#262634] text-white border border-[#282836] text-[10px] font-bold"
                         >
-                          +5
+                          +5 KSH
                         </button>
                       </div>
                     </td>
@@ -244,63 +232,71 @@ export default function FarmerDashboard() {
 
       {/* Post Harvest Modal */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-150">
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl max-w-md w-full p-6 shadow-2xl">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
-              List Fresh Farm Crop
-            </h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-xs p-4 font-mono">
+          <div className="bg-[#0d0d12] border-2 border-[#333342] max-w-md w-full p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-[#242430]">
+              <h3 className="text-sm font-black text-white uppercase tracking-wider">
+                POST HARVEST LOT // FARM GATE
+              </h3>
+              <button
+                onClick={() => setIsAddModalOpen(false)}
+                className="text-[#666675] hover:text-white px-2 py-1 text-xs border border-[#252530]"
+              >
+                [ESC]
+              </button>
+            </div>
 
-            <form onSubmit={handleAddSubmit} className="space-y-4">
+            <form onSubmit={handleAddSubmit} className="space-y-3 text-xs">
               <div>
-                <label className="text-xs font-semibold text-gray-500 block mb-1">Crop Type</label>
+                <label className="text-[10px] text-[#777785] uppercase block mb-1">Crop Type:</label>
                 <select
                   value={newProductId}
                   onChange={(e) => setNewProductId(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-800 text-sm font-medium"
+                  className="w-full bg-[#14141c] border border-[#282838] text-white py-2 px-3 font-bold"
                 >
                   {products.map((p) => (
                     <option key={p.id} value={p.id}>
-                      {p.name} ({p.category} - {p.unit})
+                      {p.name} ({p.unit})
                     </option>
                   ))}
                 </select>
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-gray-500 block mb-1">Farm Rate (KSh / unit)</label>
+                <label className="text-[10px] text-[#777785] uppercase block mb-1">Farm Gate Rate (KSh):</label>
                 <input
                   type="number"
                   min="1"
                   value={newPrice}
                   onChange={(e) => setNewPrice(parseInt(e.target.value) || 1)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-800 text-sm font-medium"
+                  className="w-full bg-[#14141c] border border-[#282838] text-white py-2 px-3 font-bold"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-gray-500 block mb-1">Harvest Lot Quantity</label>
+                <label className="text-[10px] text-[#777785] uppercase block mb-1">Harvest Lot Quantity:</label>
                 <input
                   type="number"
                   min="5"
                   value={newStock}
                   onChange={(e) => setNewStock(parseInt(e.target.value) || 5)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-800 text-sm font-medium"
+                  className="w-full bg-[#14141c] border border-[#282838] text-white py-2 px-3 font-bold"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-4">
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#22222a]">
                 <button
                   type="button"
                   onClick={() => setIsAddModalOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-xs font-semibold"
+                  className="px-3 py-2 text-[#777785] hover:text-white"
                 >
-                  Cancel
+                  [CANCEL]
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold"
+                  className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-black font-black uppercase"
                 >
-                  Publish Harvest
+                  COMMIT HARVEST »
                 </button>
               </div>
             </form>

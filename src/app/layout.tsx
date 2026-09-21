@@ -2,13 +2,13 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Supplier Hub - Connect Retailers, Suppliers & Delivery',
-  description: 'PWA for retailers, wholesalers, farmers & boda riders. Real-time stock alerts, supplier discovery, voice orders & delivery tracking.',
-  keywords: ['supplier hub', 'retailer', 'wholesaler', 'farmer', 'boda delivery', 'stock management', 'PWA'],
-  authors: [{ name: 'Supplier Hub Team' }],
+  title: 'SUPPLIER HUB // Nairobi B2B Supply & Boda Logistics Terminal',
+  description: 'Industrial-grade PWA dispatch network connecting retailers, wholesalers, farmers, and boda riders across East Africa.',
+  keywords: ['supplier hub', 'nairobi supply chain', 'retailer kiosk', 'wholesaler', 'farmer', 'boda delivery', 'PWA'],
+  authors: [{ name: 'Supplier Hub Logistics' }],
   openGraph: {
-    title: 'Supplier Hub',
-    description: 'Connect retailers with suppliers & delivery riders',
+    title: 'SUPPLIER HUB // B2B Terminal',
+    description: 'Direct commodity supply & boda dispatch system for East Africa',
     type: 'website',
   },
 }
@@ -16,8 +16,8 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 5,
-  themeColor: '#22c55e',
+  maximumScale: 1,
+  themeColor: '#0a0a0c',
 }
 
 export default function RootLayout({
@@ -26,16 +26,16 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className="dark" suppressHydrationWarning>
       <head>
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#22c55e" />
+        <meta name="theme-color" content="#0a0a0c" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="Supplier Hub" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="SupplierHub" />
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
       </head>
-      <body className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <body className="min-h-screen bg-[#0a0a0c] text-[#e2e2e8] antialiased selection:bg-[#d2ff00] selection:text-black font-sans">
         {children}
       </body>
     </html>

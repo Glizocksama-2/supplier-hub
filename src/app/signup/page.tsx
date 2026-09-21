@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Truck, Store, Building2, Leaf, Bike, ArrowRight } from 'lucide-react'
+import { ArrowRight, Terminal } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useAppStore } from '@/store'
 import { UserRole } from '@/types'
@@ -37,88 +37,87 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <Link href="/" className="inline-flex items-center gap-2 mb-2">
-          <div className="w-10 h-10 bg-green-600 rounded-2xl flex items-center justify-center text-white shadow-md shadow-green-600/30">
-            <Truck className="w-6 h-6" />
+    <div className="min-h-screen bg-[#0a0a0c] text-[#e2e2e8] tactical-grid font-mono flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 selection:bg-[#d2ff00] selection:text-black">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center space-y-2">
+        <Link href="/" className="inline-flex items-center gap-2">
+          <div className="w-8 h-8 bg-[#d2ff00] text-black font-black flex items-center justify-center text-sm">
+            SH
           </div>
-          <span className="text-2xl font-black text-gray-900 dark:text-white">Supplier Hub</span>
+          <span className="text-xl font-black text-white uppercase tracking-tight">SUPPLIER HUB // OPS</span>
         </Link>
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white">Create an Account</h2>
-        <p className="text-xs text-gray-500 mt-1">
-          Join hundreds of retailers, wholesalers, farmers & boda riders
+        <p className="text-xs text-[#777785] uppercase tracking-wider">
+          REGISTER NEW OPERATOR NODE // NAIROBI NETWORK
         </p>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md px-4">
-        <div className="bg-white dark:bg-gray-900 py-8 px-6 shadow-xl border border-gray-100 dark:border-gray-800 rounded-3xl sm:px-10 space-y-6">
-          <form className="space-y-4" onSubmit={handleStandardSignUp}>
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="bg-[#0e0e13] border-2 border-[#242430] p-6 sm:p-8 space-y-5">
+          <form className="space-y-4 text-xs" onSubmit={handleStandardSignUp}>
             {error && (
-              <div className="p-3 rounded-xl bg-red-50 text-red-700 border border-red-200 text-xs">
+              <div className="p-2.5 bg-[#250d0d] border border-[#551818] text-[#ff6b6b] text-[11px] font-bold">
                 {error}
               </div>
             )}
 
             <div>
-              <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                Full Name / Business Name
+              <label className="text-[10px] text-[#777785] uppercase block mb-1">
+                OPERATOR / BUSINESS IDENTIFIER
               </label>
               <input
                 type="text"
                 required
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                placeholder="e.g. Mama Sarah Kiosk"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-800 text-sm"
+                placeholder="e.g. Mama Sarah Fresh Kiosk"
+                className="w-full bg-[#0a0a0e] border border-[#282838] text-white py-2 px-3 font-mono font-bold"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                Select Your Role
+              <label className="text-[10px] text-[#777785] uppercase block mb-1">
+                NODE ROLE ASSIGNMENT
               </label>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-2 text-[11px]">
                 {[
-                  { r: 'retailer' as const, label: 'Retailer', icon: Store },
-                  { r: 'wholesaler' as const, label: 'Wholesaler', icon: Building2 },
-                  { r: 'farmer' as const, label: 'Farmer', icon: Leaf },
-                  { r: 'boda_rider' as const, label: 'Boda Rider', icon: Bike },
-                ].map(({ r, label, icon: Icon }) => (
+                  { r: 'retailer' as const, label: '[01] RETAILER', desc: 'Kiosk / Shop' },
+                  { r: 'wholesaler' as const, label: '[02] WHOLESALE', desc: 'Bulk Depot' },
+                  { r: 'farmer' as const, label: '[03] FARM GATE', desc: 'Direct Crop' },
+                  { r: 'boda_rider' as const, label: '[04] BODA', desc: 'Carrier' },
+                ].map(({ r, label, desc }) => (
                   <button
                     key={r}
                     type="button"
                     onClick={() => setRole(r)}
-                    className={`p-2.5 rounded-xl border text-left flex items-center gap-2 transition-all ${
+                    className={`p-2 border text-left transition-all ${
                       role === r
-                        ? 'border-green-600 bg-green-50/50 dark:bg-green-950/40 text-green-700 dark:text-green-300 font-bold'
-                        : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400'
+                        ? 'border-[#d2ff00] bg-[#14141c] text-[#d2ff00] font-black'
+                        : 'border-[#22222d] bg-[#0a0a0e] text-[#777785] hover:text-white'
                     }`}
                   >
-                    <Icon className="w-4 h-4" />
-                    <span className="text-xs">{label}</span>
+                    <span className="block font-bold">{label}</span>
+                    <span className="text-[9px] text-[#555562] block">{desc}</span>
                   </button>
                 ))}
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                Email address
+              <label className="text-[10px] text-[#777785] uppercase block mb-1">
+                OPERATOR EMAIL // TRANSMISSION ADDRESS
               </label>
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@domain.co.ke"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-800 text-sm"
+                placeholder="operator@domain.co.ke"
+                className="w-full bg-[#0a0a0e] border border-[#282838] text-white py-2 px-3 font-mono font-bold"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                Password
+              <label className="text-[10px] text-[#777785] uppercase block mb-1">
+                SECURE ACCESS KEY
               </label>
               <input
                 type="password"
@@ -126,23 +125,22 @@ export default function SignUpPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-800 text-sm"
+                className="w-full bg-[#0a0a0e] border border-[#282838] text-white py-2 px-3 font-mono font-bold"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 px-4 rounded-xl bg-green-600 hover:bg-green-700 text-white font-bold text-xs shadow-md shadow-green-600/20 transition-all flex items-center justify-center gap-2"
+              className="w-full py-3 bg-[#d2ff00] hover:bg-[#b8e000] text-black font-black uppercase tracking-wider text-xs transition-colors flex items-center justify-center gap-2"
             >
-              <span>{loading ? 'Creating Account...' : 'Complete Sign Up'}</span>
-              <ArrowRight className="w-4 h-4" />
+              <span>{loading ? 'REGISTERING...' : 'INITIALIZE NODE ACCESS »'}</span>
             </button>
           </form>
 
-          <div className="text-center pt-2">
-            <Link href="/login" className="text-xs text-green-600 hover:underline">
-              Already have an account? Sign in
+          <div className="text-center pt-2 border-t border-[#1e1e26]">
+            <Link href="/login" className="text-xs text-[#888894] hover:text-[#d2ff00] transition-colors">
+              [EXISTING OPERATOR? PROCEED TO AUTHENTICATION]
             </Link>
           </div>
         </div>

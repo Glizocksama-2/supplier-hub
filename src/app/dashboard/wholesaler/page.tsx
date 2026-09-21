@@ -6,13 +6,13 @@ import {
   Package,
   Clock,
   CheckCircle2,
-  Bike,
   Plus,
-  ArrowUpRight,
+  ArrowRight,
   TrendingUp,
   MapPin,
   AlertCircle,
   Truck,
+  Terminal,
 } from 'lucide-react'
 import { useAppStore } from '@/store'
 import { DemoRoleSwitcher } from '@/components/DemoRoleSwitcher'
@@ -35,10 +35,8 @@ export default function WholesalerDashboard() {
   const [newStock, setNewStock] = useState(500)
   const [newRadius, setNewRadius] = useState(25)
 
-  // Filter listings for this wholesaler
   const myListings = listings.filter((l) => l.supplier_id === currentUser.id || l.supplier?.role === 'wholesaler')
 
-  // Filter orders where supplier is wholesaler
   const myOrders = orders.filter(
     (o) => o.supplier_id === currentUser.id || o.supplier?.role === 'wholesaler'
   )
@@ -73,109 +71,99 @@ export default function WholesalerDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex flex-col">
+    <div className="min-h-screen bg-[#0a0a0c] text-[#e2e2e8] tactical-grid font-mono flex flex-col selection:bg-[#d2ff00] selection:text-black">
       <DemoRoleSwitcher />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      <main className="flex-1 max-w-[1500px] w-full mx-auto px-4 sm:px-6 py-6 space-y-6">
         {/* Wholesaler Header */}
-        <div className="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl shadow-blue-900/10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="bg-[#0f0f14] border-2 border-[#262632] p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-semibold mb-3">
-              <Building2 className="w-3.5 h-3.5" />
-              <span>Wholesaler Depot</span>
+            <div className="flex items-center gap-2 text-[10px] text-blue-400 font-black tracking-wider uppercase mb-1">
+              <span className="w-2 h-2 bg-blue-400 animate-pulse" />
+              <span>TERMINAL NODE // WHOLESALE_DEPOT_02</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight">{currentUser.business_name}</h1>
-            <p className="text-blue-100 text-sm mt-1 flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-blue-300" />
-              <span>{currentUser.address} • Contact: {currentUser.phone}</span>
+            <h1 className="text-2xl font-black text-white uppercase tracking-tight">
+              {currentUser.business_name}
+            </h1>
+            <p className="text-xs text-[#7d7d8c] mt-0.5">
+              LOC: {currentUser.address} • PHONE: {currentUser.phone}
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setIsAddModalOpen(true)}
-              className="px-4 py-2.5 rounded-xl bg-white text-blue-900 font-bold text-xs flex items-center gap-2 shadow-sm hover:bg-blue-50 transition-colors"
-            >
-              <Plus className="w-4 h-4 text-blue-700" />
-              <span>List New Produce / Grain</span>
-            </button>
+          <button
+            onClick={() => setIsAddModalOpen(true)}
+            className="px-4 py-2.5 bg-blue-500 hover:bg-blue-600 text-black font-black text-xs uppercase tracking-wider flex items-center gap-2 transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            <span>[LIST BULK COMMODITY]</span>
+          </button>
+        </div>
+
+        {/* Tactical Metrics Bar */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="p-4 bg-[#0e0e13] border border-[#22222a]">
+            <span className="text-[10px] text-[#777785] uppercase block font-bold">PENDING REQUISITIONS</span>
+            <p className="text-2xl font-black text-[#ff6b00] mt-1">{pendingOrders.length}</p>
+          </div>
+          <div className="p-4 bg-[#0e0e13] border border-[#22222a]">
+            <span className="text-[10px] text-[#777785] uppercase block font-bold">CARRIERS IN TRANSIT</span>
+            <p className="text-2xl font-black text-blue-400 mt-1">{activeOrders.length}</p>
+          </div>
+          <div className="p-4 bg-[#0e0e13] border border-[#22222a]">
+            <span className="text-[10px] text-[#777785] uppercase block font-bold">FULFILLED INVOICES</span>
+            <p className="text-2xl font-black text-[#d2ff00] mt-1">{completedOrders.length}</p>
+          </div>
+          <div className="p-4 bg-[#0e0e13] border border-[#22222a]">
+            <span className="text-[10px] text-[#777785] uppercase block font-bold">ACTIVE DEPOT LISTINGS</span>
+            <p className="text-2xl font-black text-white mt-1">{myListings.length}</p>
           </div>
         </div>
 
-        {/* Metrics Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-xs">
-            <span className="text-xs text-gray-500 font-medium">Pending Retail Orders</span>
-            <p className="text-2xl font-black text-amber-600 mt-1">{pendingOrders.length}</p>
-          </div>
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-xs">
-            <span className="text-xs text-gray-500 font-medium">In Transit via Boda</span>
-            <p className="text-2xl font-black text-indigo-600 mt-1">{activeOrders.length}</p>
-          </div>
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-xs">
-            <span className="text-xs text-gray-500 font-medium">Delivered Orders</span>
-            <p className="text-2xl font-black text-green-600 mt-1">{completedOrders.length}</p>
-          </div>
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-xs">
-            <span className="text-xs text-gray-500 font-medium">Active Listings</span>
-            <p className="text-2xl font-black text-blue-600 mt-1">{myListings.length}</p>
-          </div>
-        </div>
-
-        {/* Pending Orders Action Section */}
+        {/* Incoming Kiosk Requisitions Action Queue */}
         {pendingOrders.length > 0 && (
-          <section className="space-y-4">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-amber-500 animate-ping" />
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                <Clock className="w-5 h-5 text-amber-500" />
-                Orders Requiring Confirmation ({pendingOrders.length})
-              </h2>
+          <section className="space-y-3">
+            <div className="flex items-center justify-between border-b border-[#ff6b00]/30 pb-2">
+              <div className="flex items-center gap-2 text-xs font-black text-[#ff6b00] uppercase tracking-wider">
+                <Clock className="w-4 h-4 text-[#ff6b00]" />
+                <span>INCOMING KIOSK REQUISITIONS // {pendingOrders.length} AWAITING DISPATCH</span>
+              </div>
             </div>
 
-            <div className="grid gap-4">
+            <div className="grid gap-3">
               {pendingOrders.map((ord) => (
                 <div
                   key={ord.id}
-                  className="bg-amber-50/50 dark:bg-amber-950/20 border-2 border-amber-400/50 rounded-2xl p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                  className="bg-[#120f0a] border-2 border-[#ff6b00] p-4 flex flex-col md:flex-row md:items-center justify-between gap-4"
                 >
-                  <div>
+                  <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-base text-gray-900 dark:text-white">
-                        Order #{ord.id}
-                      </span>
-                      <span className="text-xs font-semibold px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200">
-                        NEW RETAILER REQUEST
+                      <span className="text-sm font-black text-white">REQUISITION #{ord.id}</span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 bg-[#ff6b00]/20 text-[#ff6b00] border border-[#ff6b00]/40 uppercase">
+                        ACTION REQUIRED
                       </span>
                     </div>
 
-                    <p className="text-sm font-semibold text-gray-800 dark:text-gray-200 mt-1">
+                    <p className="text-sm font-bold text-white">
                       {ord.retailer?.business_name || 'Retailer'}: {ord.quantity} {ord.product?.unit} {ord.product?.name}
                     </p>
-                    <p className="text-xs text-gray-500 mt-0.5">
-                      Delivery to: {ord.delivery_address} • Placed {new Date(ord.created_at).toLocaleTimeString()}
+                    <p className="text-xs text-[#888894]">
+                      DESTINATION: {ord.delivery_address}
                     </p>
-                    {ord.delivery_notes && (
-                      <p className="text-xs text-gray-400 italic mt-1">"{ord.delivery_notes}"</p>
-                    )}
                   </div>
 
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-4 border-t md:border-t-0 md:border-l border-[#2d2518] pt-3 md:pt-0 md:pl-4">
                     <div className="text-right">
-                      <span className="text-lg font-black text-gray-900 dark:text-white">
+                      <span className="text-[10px] text-[#777785] uppercase block">INVOICE AMOUNT</span>
+                      <span className="text-lg font-black text-[#d2ff00]">
                         KSh {ord.total_amount?.toLocaleString()}
-                      </span>
-                      <span className="text-xs text-gray-500 block">
-                        Rate: KSh {ord.unit_price}/{ord.product?.unit}
                       </span>
                     </div>
 
                     <button
                       onClick={() => supplierConfirmOrder(ord.id)}
-                      className="bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 px-5 rounded-xl text-xs flex items-center gap-2 shadow-sm transition-colors"
+                      className="px-4 py-2.5 bg-[#d2ff00] hover:bg-[#b8e000] text-black font-black text-xs uppercase tracking-wider transition-colors"
                     >
-                      <CheckCircle2 className="w-4 h-4" />
-                      <span>Confirm & Dispatch Boda</span>
+                      CONFIRM & DISPATCH BODA »
                     </button>
                   </div>
                 </div>
@@ -184,59 +172,59 @@ export default function WholesalerDashboard() {
           </section>
         )}
 
-        {/* Product Catalog & Pricing Management */}
-        <section className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl p-6 shadow-xs">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-gray-100 dark:border-gray-800">
-            <div>
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white">Depot Wholesale Listings</h2>
-              <p className="text-xs text-gray-500">Live prices and available bulk stock for retail buyers</p>
-            </div>
+        {/* Wholesale Inventory & Dynamic Rate Controls */}
+        <section className="bg-[#0e0e13] border border-[#242430] p-5 space-y-4">
+          <div className="flex items-center justify-between border-b border-[#1c1c24] pb-3">
+            <h2 className="text-sm font-black text-white uppercase tracking-wider">
+              DEPOT COMMODITY LISTINGS & RATE CONTROL
+            </h2>
+            <span className="text-[10px] text-[#666675]">LIVE B2B WHOLESALE RATES</span>
           </div>
 
-          <div className="overflow-x-auto mt-4">
-            <table className="w-full text-left text-sm">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
               <thead>
-                <tr className="text-xs uppercase text-gray-400 border-b border-gray-100 dark:border-gray-800">
-                  <th className="pb-3 font-semibold">Commodity</th>
-                  <th className="pb-3 font-semibold">Category</th>
-                  <th className="pb-3 font-semibold">Wholesale Price</th>
-                  <th className="pb-3 font-semibold">Depot Stock</th>
-                  <th className="pb-3 font-semibold">Delivery Radius</th>
-                  <th className="pb-3 font-semibold text-right">Adjust Price</th>
+                <tr className="text-[10px] text-[#666675] uppercase border-b border-[#20202a]">
+                  <th className="pb-2 font-bold">COMMODITY</th>
+                  <th className="pb-2 font-bold">CATEGORY</th>
+                  <th className="pb-2 font-bold">WHOLESALE RATE</th>
+                  <th className="pb-2 font-bold">DEPOT TONNAGE / STOCK</th>
+                  <th className="pb-2 font-bold">TRANSIT RADIUS</th>
+                  <th className="pb-2 font-bold text-right">PRICE CALIBRATION</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+              <tbody className="divide-y divide-[#181820]">
                 {myListings.map((list) => (
-                  <tr key={list.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors">
-                    <td className="py-3.5 font-bold text-gray-900 dark:text-white">
+                  <tr key={list.id} className="hover:bg-[#14141c] transition-colors">
+                    <td className="py-3 font-bold text-white uppercase">
                       {list.product?.name}
                     </td>
-                    <td className="py-3.5 text-xs text-gray-500">{list.product?.category}</td>
-                    <td className="py-3.5">
-                      <span className="font-black text-green-600 dark:text-green-400">
+                    <td className="py-3 text-[11px] text-[#787884]">{list.product?.category}</td>
+                    <td className="py-3">
+                      <span className="font-black text-[#d2ff00] text-sm">
                         KSh {list.price_per_unit}
                       </span>
-                      <span className="text-xs text-gray-400">/{list.unit}</span>
+                      <span className="text-[10px] text-[#666675]">/{list.unit}</span>
                     </td>
-                    <td className="py-3.5 font-bold text-gray-700 dark:text-gray-300">
+                    <td className="py-3 font-bold text-white">
                       {list.available_stock} {list.unit}
                     </td>
-                    <td className="py-3.5 text-xs text-gray-500">{list.delivery_radius_km} km</td>
-                    <td className="py-3.5 text-right">
-                      <div className="inline-flex items-center gap-1.5">
+                    <td className="py-3 text-[11px] text-[#787884]">{list.delivery_radius_km} KM</td>
+                    <td className="py-3 text-right">
+                      <div className="inline-flex items-center gap-1">
                         <button
                           onClick={() =>
                             updateListing(list.id, { price_per_unit: Math.max(10, list.price_per_unit - 5) })
                           }
-                          className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-xs hover:bg-gray-200"
+                          className="px-2 py-0.5 bg-[#181820] hover:bg-[#262634] text-white border border-[#282836] text-[10px] font-bold"
                         >
-                          -5
+                          -5 KSH
                         </button>
                         <button
                           onClick={() => updateListing(list.id, { price_per_unit: list.price_per_unit + 5 })}
-                          className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-xs hover:bg-gray-200"
+                          className="px-2 py-0.5 bg-[#181820] hover:bg-[#262634] text-white border border-[#282836] text-[10px] font-bold"
                         >
-                          +5
+                          +5 KSH
                         </button>
                       </div>
                     </td>
@@ -246,113 +234,75 @@ export default function WholesalerDashboard() {
             </table>
           </div>
         </section>
-
-        {/* Orders History & Delivery Lifecycle */}
-        <section className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl p-6 shadow-xs">
-          <h2 className="text-lg font-bold text-gray-900 dark:text-white pb-4 border-b border-gray-100 dark:border-gray-800">
-            Order Fulfillment Queue
-          </h2>
-
-          <div className="divide-y divide-gray-100 dark:divide-gray-800 mt-4">
-            {myOrders.length === 0 ? (
-              <p className="text-xs text-gray-400 py-6 text-center">No orders received yet.</p>
-            ) : (
-              myOrders.map((ord) => (
-                <div key={ord.id} className="py-3.5 flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 flex items-center justify-center font-bold text-xs">
-                      #{ord.id.slice(-3)}
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-gray-900 dark:text-white">
-                        {ord.quantity} {ord.product?.unit} {ord.product?.name} → {ord.retailer?.business_name}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        Total: KSh {ord.total_amount?.toLocaleString()} • Status: <span className="font-semibold text-blue-600">{ord.status}</span>
-                      </p>
-                    </div>
-                  </div>
-
-                  <span className="text-xs text-gray-400">
-                    {new Date(ord.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </span>
-                </div>
-              ))
-            )}
-          </div>
-        </section>
       </main>
 
-      {/* Add Produce Listing Modal */}
+      {/* Add Produce Modal */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-150">
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl max-w-md w-full p-6 shadow-2xl">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
-              Add New Wholesale Listing
-            </h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-xs p-4 font-mono">
+          <div className="bg-[#0d0d12] border-2 border-[#333342] max-w-md w-full p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-[#242430]">
+              <h3 className="text-sm font-black text-white uppercase tracking-wider">
+                LIST BULK COMMODITY // DEPOT ADD
+              </h3>
+              <button
+                onClick={() => setIsAddModalOpen(false)}
+                className="text-[#666675] hover:text-white px-2 py-1 text-xs border border-[#252530]"
+              >
+                [ESC]
+              </button>
+            </div>
 
-            <form onSubmit={handleAddSubmit} className="space-y-4">
+            <form onSubmit={handleAddSubmit} className="space-y-3 text-xs">
               <div>
-                <label className="text-xs font-semibold text-gray-500 block mb-1">Select Product</label>
+                <label className="text-[10px] text-[#777785] uppercase block mb-1">Select Commodity:</label>
                 <select
                   value={newProductId}
                   onChange={(e) => setNewProductId(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-800 text-sm font-medium"
+                  className="w-full bg-[#14141c] border border-[#282838] text-white py-2 px-3 font-bold"
                 >
                   {products.map((p) => (
                     <option key={p.id} value={p.id}>
-                      {p.name} ({p.category} - {p.unit})
+                      {p.name} ({p.unit})
                     </option>
                   ))}
                 </select>
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-gray-500 block mb-1">Wholesale Price (KSh / unit)</label>
+                <label className="text-[10px] text-[#777785] uppercase block mb-1">Bulk Unit Rate (KSh):</label>
                 <input
                   type="number"
                   min="1"
                   value={newPrice}
                   onChange={(e) => setNewPrice(parseInt(e.target.value) || 1)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-800 text-sm font-medium"
+                  className="w-full bg-[#14141c] border border-[#282838] text-white py-2 px-3 font-bold"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-gray-500 block mb-1">Available Stock (units)</label>
+                <label className="text-[10px] text-[#777785] uppercase block mb-1">Available Depot Volume:</label>
                 <input
                   type="number"
                   min="10"
                   value={newStock}
                   onChange={(e) => setNewStock(parseInt(e.target.value) || 10)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-800 text-sm font-medium"
+                  className="w-full bg-[#14141c] border border-[#282838] text-white py-2 px-3 font-bold"
                 />
               </div>
 
-              <div>
-                <label className="text-xs font-semibold text-gray-500 block mb-1">Max Delivery Radius (km)</label>
-                <input
-                  type="number"
-                  min="5"
-                  value={newRadius}
-                  onChange={(e) => setNewRadius(parseInt(e.target.value) || 5)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-800 text-sm font-medium"
-                />
-              </div>
-
-              <div className="flex items-center justify-end gap-2 pt-4">
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#22222a]">
                 <button
                   type="button"
                   onClick={() => setIsAddModalOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-xs font-semibold"
+                  className="px-3 py-2 text-[#777785] hover:text-white"
                 >
-                  Cancel
+                  [CANCEL]
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold"
+                  className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-black font-black uppercase"
                 >
-                  Publish Listing
+                  COMMIT LISTING »
                 </button>
               </div>
             </form>

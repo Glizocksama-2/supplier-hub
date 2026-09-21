@@ -4,16 +4,12 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import {
-  Store,
-  Building2,
-  Leaf,
-  Bike,
-  Mic,
-  Bell,
+  Radio,
   RotateCcw,
-  Home,
-  Check,
-  ChevronDown,
+  Bell,
+  Mic,
+  ArrowUpRight,
+  Terminal,
 } from 'lucide-react'
 import { useAppStore } from '@/store'
 import { UserRole } from '@/types'
@@ -36,11 +32,11 @@ export function DemoRoleSwitcher() {
   const [isVoiceOpen, setIsVoiceOpen] = useState(false)
   const [isNotifsOpen, setIsNotifsOpen] = useState(false)
 
-  const roles: { role: UserRole; label: string; icon: any; path: string; name: string }[] = [
-    { role: 'retailer', label: 'Retailer', icon: Store, path: '/dashboard/retailer', name: 'Mama Sarah Fresh Kiosk' },
-    { role: 'wholesaler', label: 'Wholesaler', icon: Building2, path: '/dashboard/wholesaler', name: 'Kilimo Traders' },
-    { role: 'farmer', label: 'Farmer', icon: Leaf, path: '/dashboard/farmer', name: 'Green Valley Co-op' },
-    { role: 'boda_rider', label: 'Boda Rider', icon: Bike, path: '/dashboard/boda_rider', name: 'James Otieno (Boda)' },
+  const roles: { role: UserRole; code: string; label: string; path: string; name: string }[] = [
+    { role: 'retailer', code: '01', label: 'RETAILER', path: '/dashboard/retailer', name: 'MAMA SARAH' },
+    { role: 'wholesaler', code: '02', label: 'WHOLESALE', path: '/dashboard/wholesaler', name: 'KILIMO TRADERS' },
+    { role: 'farmer', code: '03', label: 'FARM GATE', path: '/dashboard/farmer', name: 'GREEN VALLEY' },
+    { role: 'boda_rider', code: '04', label: 'BODA DISPATCH', path: '/dashboard/boda_rider', name: 'JAMES BODA' },
   ]
 
   const handleSwitch = (r: UserRole, path: string) => {
@@ -50,123 +46,135 @@ export function DemoRoleSwitcher() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row items-center justify-between py-2.5 gap-3">
-            {/* Left: Brand + Quick Home */}
-            <div className="flex items-center justify-between w-full sm:w-auto gap-4">
+      <header className="sticky top-0 z-50 bg-[#0e0e11] border-b border-[#242429] font-mono text-xs select-none">
+        <div className="max-w-[1500px] mx-auto px-3 sm:px-4">
+          <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between py-2 gap-2">
+            {/* Left: Terminal Branding */}
+            <div className="flex items-center justify-between gap-3">
               <Link href="/" className="flex items-center gap-2 group">
-                <div className="w-8 h-8 rounded-xl bg-green-600 flex items-center justify-center text-white font-black text-sm group-hover:bg-green-700 transition-colors">
+                <div className="w-6 h-6 bg-[#d2ff00] text-black font-black flex items-center justify-center text-xs group-hover:bg-white transition-colors">
                   SH
                 </div>
-                <div className="leading-tight">
-                  <span className="font-bold text-gray-900 dark:text-white text-base">Supplier Hub</span>
-                  <span className="text-[10px] block text-green-600 font-semibold uppercase tracking-wider">
-                    Interactive Hackathon MVP
-                  </span>
+                <div className="flex items-center gap-2 font-bold tracking-tight">
+                  <span className="text-white text-sm">SUPPLIER-HUB</span>
+                  <span className="text-[#555562] text-[10px] hidden sm:inline">// NAIROBI_CORRIDOR_V2</span>
                 </div>
               </Link>
 
-              {/* Mobile controls */}
-              <div className="flex items-center gap-2 sm:hidden">
-                <button
-                  onClick={() => setIsVoiceOpen(true)}
-                  className="p-2 rounded-xl bg-green-50 text-green-700 dark:bg-green-950/50 dark:text-green-300"
-                  title="Voice AI"
-                >
-                  <Mic className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setIsNotifsOpen(!isNotifsOpen)}
-                  className="p-2 relative rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
-                >
-                  <Bell className="w-4 h-4" />
-                  {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500 text-white text-[10px] flex items-center justify-center">
-                      {unreadCount}
-                    </span>
-                  )}
-                </button>
+              <div className="flex items-center gap-2">
+                <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 border border-[#242429] bg-[#141418] text-[#888892] text-[10px]">
+                  <span className="w-1.5 h-1.5 bg-[#d2ff00] animate-ping" />
+                  ONLINE: EAT_GMT+3
+                </span>
+
+                {/* Mobile Trigger Buttons */}
+                <div className="flex items-center gap-1.5 lg:hidden">
+                  <button
+                    onClick={() => setIsVoiceOpen(true)}
+                    className="p-1.5 bg-[#d2ff00] text-black font-bold"
+                  >
+                    <Mic className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    onClick={() => setIsNotifsOpen(!isNotifsOpen)}
+                    className="p-1.5 bg-[#1a1a20] text-white border border-[#2e2e38] relative"
+                  >
+                    <Bell className="w-3.5 h-3.5" />
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-[#ff6b00] text-black text-[9px] font-black flex items-center justify-center">
+                        {unreadCount}
+                      </span>
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
 
-            {/* Center: Role Switcher Tabs */}
-            <div className="flex items-center gap-1.5 p-1 bg-gray-100 dark:bg-gray-800/80 rounded-2xl w-full sm:w-auto overflow-x-auto">
-              {roles.map(({ role, label, icon: Icon, path }) => {
+            {/* Center: Tactical Persona Toggle Grid */}
+            <div className="flex items-center gap-1 overflow-x-auto bg-[#08080a] p-1 border border-[#222228]">
+              {roles.map(({ role, code, label, path, name }) => {
                 const isActive = pathname.includes(role) || currentRole === role
                 return (
                   <button
                     key={role}
                     onClick={() => handleSwitch(role, path)}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-200 ${
+                    className={`flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] font-mono tracking-wider uppercase whitespace-nowrap transition-all ${
                       isActive
-                        ? 'bg-white dark:bg-gray-900 text-green-700 dark:text-green-400 shadow-xs scale-100'
-                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                        ? 'bg-[#d2ff00] text-black font-black shadow-sm'
+                        : 'text-[#8e8e9c] hover:text-white hover:bg-[#16161c]'
                     }`}
                   >
-                    <Icon className="w-3.5 h-3.5" />
+                    <span className={isActive ? 'text-black font-bold opacity-70' : 'text-[#ff6b00]'}>
+                      [{code}]
+                    </span>
                     <span>{label}</span>
+                    <span className={`text-[9px] hidden xl:inline ${isActive ? 'text-black/70' : 'text-[#555562]'}`}>
+                      ({name})
+                    </span>
                   </button>
                 )
               })}
             </div>
 
-            {/* Right: Actions (Voice, Notifications, Reset Demo) */}
-            <div className="hidden sm:flex items-center gap-3">
-              {/* Voice AI button */}
+            {/* Right: Tactical Actions */}
+            <div className="hidden lg:flex items-center gap-2">
+              {/* Voice HUD launcher */}
               <button
                 onClick={() => setIsVoiceOpen(true)}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-green-600 hover:bg-green-700 text-white text-xs font-semibold shadow-xs shadow-green-600/20 transition-all hover:scale-105"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-[#18181f] hover:bg-[#22222a] border border-[#33333e] text-[#d2ff00] hover:border-[#d2ff00] transition-colors"
               >
                 <Mic className="w-3.5 h-3.5 animate-pulse" />
-                <span>Voice Order AI</span>
+                <span className="text-[11px] font-bold">VOICE HUD</span>
               </button>
 
-              {/* Notifications bell */}
+              {/* Realtime Event Stream Drawer */}
               <div className="relative">
                 <button
                   onClick={() => setIsNotifsOpen(!isNotifsOpen)}
-                  className="p-2 relative rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 transition-colors"
+                  className={`flex items-center gap-1.5 px-2.5 py-1.5 border transition-colors ${
+                    unreadCount > 0
+                      ? 'border-[#ff6b00] bg-[#ff6b00]/10 text-[#ff6b00]'
+                      : 'border-[#242429] bg-[#141418] text-[#888892] hover:text-white'
+                  }`}
                 >
-                  <Bell className="w-4 h-4" />
-                  {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center animate-bounce">
-                      {unreadCount}
-                    </span>
-                  )}
+                  <Bell className="w-3.5 h-3.5" />
+                  <span className="text-[11px] font-bold">{unreadCount} ALERTS</span>
                 </button>
 
-                {/* Notifications Dropdown */}
+                {/* Dropdown */}
                 {isNotifsOpen && (
-                  <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-xl p-3 z-50 animate-in fade-in slide-in-from-top-2">
-                    <div className="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-gray-800">
-                      <span className="font-bold text-xs text-gray-900 dark:text-white">Live Activity Feed</span>
+                  <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-[#0e0e12] border-2 border-[#33333d] shadow-2xl p-3 z-50 animate-in fade-in">
+                    <div className="flex items-center justify-between pb-2 border-b border-[#242429]">
+                      <span className="text-[11px] font-black text-[#d2ff00] uppercase tracking-wider">
+                        // DISPATCH EVENT LOG
+                      </span>
                       <button
                         onClick={markAllNotificationsRead}
-                        className="text-[10px] text-green-600 hover:underline"
+                        className="text-[10px] text-[#888892] hover:text-white underline uppercase"
                       >
-                        Mark all read
+                        [CLEAR ALL]
                       </button>
                     </div>
-                    <div className="max-h-72 overflow-y-auto divide-y divide-gray-100 dark:divide-gray-800 py-1">
+
+                    <div className="max-h-80 overflow-y-auto divide-y divide-[#1e1e24] py-1">
                       {notifications.length === 0 ? (
-                        <p className="text-xs text-gray-400 text-center py-4">No notifications yet</p>
+                        <p className="text-[11px] text-[#555562] py-4 text-center">NO RECENT DISPATCH LOGS</p>
                       ) : (
-                        notifications.slice(0, 8).map((n) => (
+                        notifications.slice(0, 10).map((n) => (
                           <div
                             key={n.id}
                             onClick={() => markNotificationRead(n.id)}
-                            className={`py-2 px-1 text-left cursor-pointer transition-colors ${
-                              !n.is_read ? 'bg-green-50/50 dark:bg-green-950/20' : ''
+                            className={`py-2.5 px-2 text-left cursor-pointer transition-colors ${
+                              !n.is_read ? 'bg-[#181822] border-l-2 border-[#ff6b00]' : 'hover:bg-[#14141a]'
                             }`}
                           >
-                            <p className="text-xs font-semibold text-gray-900 dark:text-white">{n.title}</p>
-                            <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5 leading-snug">
-                              {n.message}
-                            </p>
-                            <span className="text-[9px] text-gray-400 mt-1 block">
-                              {new Date(n.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                            </span>
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] font-bold text-white uppercase">{n.title}</span>
+                              <span className="text-[9px] text-[#555562]">
+                                {new Date(n.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-[#a0a0ae] mt-1 leading-snug">{n.message}</p>
                           </div>
                         ))
                       )}
@@ -175,16 +183,16 @@ export function DemoRoleSwitcher() {
                 )}
               </div>
 
-              {/* Reset Demo Data */}
+              {/* Reset State */}
               <button
                 onClick={() => {
                   resetDemoData()
-                  alert('Demo data has been reset to starting state!')
+                  alert('[STATUS: SIMULATION_DATA_RESET_TO_DEFAULTS]')
                 }}
-                className="p-2 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
-                title="Reset simulation data"
+                className="p-1.5 border border-[#242429] bg-[#141418] hover:bg-[#1f1f26] text-[#888892] hover:text-white"
+                title="Reset simulation telemetry"
               >
-                <RotateCcw className="w-4 h-4" />
+                <RotateCcw className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>

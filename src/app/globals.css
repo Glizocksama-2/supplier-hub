@@ -1,36 +1,79 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #22c55e;
-  --color-primary-foreground: #ffffff;
-  --color-secondary: #e5e7eb;
-  --color-secondary-foreground: #1f2937;
-  --color-muted: #f3f4f6;
-  --color-muted-foreground: #9ca3af;
-  --color-accent: #f3f4f6;
-  --color-accent-foreground: #1f2937;
-  --color-destructive: #ef4444;
-  --color-destructive-foreground: #f9fafb;
-  --color-border: #e5e7eb;
-  --color-input: #e5e7eb;
-  --color-ring: #22c55e;
-  --color-background: #ffffff;
-  --color-foreground: #111827;
+  --color-substrate: #0a0a0c;
+  --color-surface: #141417;
+  --color-surface-elevated: #1c1c20;
+  --color-border-subtle: #242429;
+  --color-border-strong: #383842;
+  
+  --color-lime-primary: #d2ff00;
+  --color-lime-hover: #b8e000;
+  --color-orange-alert: #ff6b00;
+  --color-red-hazard: #ff2b2b;
+  
+  --color-text-bright: #ffffff;
+  --color-text-main: #e2e2e8;
+  --color-text-muted: #888892;
+  --color-text-dim: #555560;
 }
 
 @layer base {
-  * {
-    border-color: var(--color-border);
+  :root {
+    color-scheme: dark;
+    background-color: #0a0a0c;
+    color: #e2e2e8;
   }
+
   body {
-    background-color: var(--color-background);
-    color: var(--color-foreground);
-    font-feature-settings: "rlig" 1, "calt" 1;
+    background-color: #0a0a0c;
+    color: #e2e2e8;
+    font-feature-settings: "tnum" 1, "zero" 1;
+    overflow-x: hidden;
+    letter-spacing: -0.01em;
+  }
+
+  /* Custom scrollbar for tactical feel */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0a0a0c;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #242429;
+    border-radius: 2px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #d2ff00;
   }
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+/* Subtle tactical grid background */
+.tactical-grid {
+  background-size: 32px 32px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+}
+
+/* Dot matrix pattern */
+.dot-matrix {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+/* Scanline effect */
+.scanline {
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(0, 0, 0, 0.25) 50%
+  ), linear-gradient(
+    90deg,
+    rgba(255, 0, 0, 0.03),
+    rgba(0, 255, 0, 0.01),
+    rgba(0, 0, 255, 0.03)
+  );
+  background-size: 100% 4px, 6px 100%;
 }

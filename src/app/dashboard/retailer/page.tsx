@@ -2,19 +2,16 @@
 
 import { useState } from 'react'
 import {
-  Store,
   AlertTriangle,
-  TrendingDown,
   ShoppingBag,
   ArrowRight,
-  Sparkles,
   Truck,
-  CheckCircle,
+  CheckCircle2,
   Clock,
   MapPin,
   ChevronRight,
-  Filter,
-  Package,
+  Zap,
+  Terminal,
 } from 'lucide-react'
 import { useAppStore } from '@/store'
 import { DemoRoleSwitcher } from '@/components/DemoRoleSwitcher'
@@ -31,22 +28,18 @@ export default function RetailerDashboard() {
     updateInventoryStock,
   } = useAppStore()
 
-  // Selected item for supplier comparison modal
   const [selectedRestockItem, setSelectedRestockItem] = useState<RetailerInventory | null>(null)
   const [orderQuantity, setOrderQuantity] = useState<number>(50)
-  const [deliveryNotes, setDeliveryNotes] = useState<string>('Deliver directly to front kiosk counter')
+  const [deliveryNotes, setDeliveryNotes] = useState<string>('Counter drop-off at kiosk')
   const [orderSuccessMessage, setOrderSuccessMessage] = useState<string | null>(null)
 
-  // Identify low stock items
   const lowStockItems = inventory.filter((i) => i.current_stock <= i.low_stock_threshold)
   const healthyStockItems = inventory.filter((i) => i.current_stock > i.low_stock_threshold)
 
-  // Get matching suppliers for the selected restock item
   const relevantListings: SupplierListing[] = selectedRestockItem
     ? listings
         .filter((l) => l.product_id === selectedRestockItem.product_id && l.is_active)
         .sort((a, b) => {
-          // Sort by total cost (product price * qty + delivery fee)
           const costA = a.price_per_unit * orderQuantity + (a.total_delivery_fee || 0)
           const costB = b.price_per_unit * orderQuantity + (b.total_delivery_fee || 0)
           return costA - costB
@@ -71,7 +64,7 @@ export default function RetailerDashboard() {
     })
 
     setOrderSuccessMessage(
-      `Order #${newOrder.id} successfully placed with ${listing.supplier?.business_name}! Awaiting supplier confirmation.`
+      `DISPATCH LOGGED: Requisition #${newOrder.id} confirmed with ${listing.supplier?.business_name}. Boda rider broadcast active.`
     )
 
     setTimeout(() => {
@@ -81,86 +74,85 @@ export default function RetailerDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex flex-col">
+    <div className="min-h-screen bg-[#0a0a0c] text-[#e2e2e8] tactical-grid font-mono flex flex-col selection:bg-[#d2ff00] selection:text-black">
       <DemoRoleSwitcher />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        {/* Retailer Header */}
-        <div className="bg-gradient-to-r from-green-700 via-emerald-600 to-green-800 rounded-3xl p-6 sm:p-8 text-white shadow-xl shadow-green-900/10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <main className="flex-1 max-w-[1500px] w-full mx-auto px-4 sm:px-6 py-6 space-y-6">
+        {/* Terminal Ops Header */}
+        <div className="bg-[#0f0f14] border-2 border-[#262632] p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-semibold mb-3">
-              <Store className="w-3.5 h-3.5" />
-              <span>Retailer Portal</span>
+            <div className="flex items-center gap-2 text-[10px] text-[#ff6b00] font-black tracking-wider uppercase mb-1">
+              <span className="w-2 h-2 bg-[#ff6b00] animate-pulse" />
+              <span>TERMINAL NODE // RETAIL_OPS_01</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight">{currentUser.business_name}</h1>
-            <p className="text-green-100 text-sm mt-1 flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-green-300" />
-              <span>{currentUser.address} • Phone: {currentUser.phone}</span>
+            <h1 className="text-2xl font-black text-white uppercase tracking-tight">
+              {currentUser.business_name}
+            </h1>
+            <p className="text-xs text-[#7d7d8c] mt-0.5">
+              LOC: {currentUser.address} • PHONE: {currentUser.phone}
             </p>
           </div>
 
-          {/* Quick Simulation controls */}
-          <div className="flex flex-wrap items-center gap-3">
+          {/* Quick Hardware Macro Triggers */}
+          <div className="flex items-center gap-2">
             <button
               onClick={() => triggerLowStockSimulation('prod-1')}
-              className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-semibold backdrop-blur-sm transition-all"
+              className="px-3 py-2 bg-[#181822] hover:bg-[#ff2b2b]/15 border border-[#2d2d3c] hover:border-[#ff2b2b] text-[#ff2b2b] text-xs font-bold transition-all"
             >
-              ⚡ Simulate Maize Stockout
+              [⚡ SHORTAGE: MAIZE]
             </button>
             <button
               onClick={() => triggerLowStockSimulation('prod-4')}
-              className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-semibold backdrop-blur-sm transition-all"
+              className="px-3 py-2 bg-[#181822] hover:bg-[#ff2b2b]/15 border border-[#2d2d3c] hover:border-[#ff2b2b] text-[#ff2b2b] text-xs font-bold transition-all"
             >
-              ⚡ Simulate Tomato Stockout
+              [⚡ SHORTAGE: TOMATOES]
             </button>
           </div>
         </div>
 
-        {/* Low Stock Alerts Section */}
+        {/* Urgent Shortages Warning Zone */}
         {lowStockItems.length > 0 && (
-          <section className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-red-500 animate-ping" />
-                <h2 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                  <AlertTriangle className="w-5 h-5 text-red-500" />
-                  Urgent Restock Needed ({lowStockItems.length} items low)
-                </h2>
+          <section className="space-y-3">
+            <div className="flex items-center justify-between border-b border-[#ff2b2b]/30 pb-2">
+              <div className="flex items-center gap-2 text-xs font-black text-[#ff2b2b] uppercase tracking-wider">
+                <AlertTriangle className="w-4 h-4 text-[#ff2b2b]" />
+                <span>ACTIVE SHORTAGE WARNING // {lowStockItems.length} SKUs BELOW THRESHOLD</span>
               </div>
-              <span className="text-xs text-red-500 font-semibold bg-red-50 dark:bg-red-950/40 px-3 py-1 rounded-full border border-red-200 dark:border-red-900">
-                PWA Stock Alert Active
+              <span className="text-[10px] bg-[#ff2b2b]/20 text-[#ff2b2b] border border-[#ff2b2b]/40 px-2 py-0.5 font-bold">
+                PRIORITY_DISPATCH_REQUIRED
               </span>
             </div>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {lowStockItems.map((item) => (
                 <div
                   key={item.id}
-                  className="bg-white dark:bg-gray-900 border-2 border-red-500/40 rounded-2xl p-5 shadow-sm hover:border-red-500 transition-all flex flex-col justify-between"
+                  className="bg-[#120a0c] border-2 border-[#ff2b2b] p-4 flex flex-col justify-between"
                 >
                   <div>
                     <div className="flex items-start justify-between">
                       <div>
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-red-600 bg-red-50 dark:bg-red-950 px-2 py-0.5 rounded-md">
-                          CRITICAL LOW
+                        <span className="text-[10px] font-black text-[#ff2b2b] uppercase tracking-wider block">
+                          [CRITICAL SHORTAGE]
                         </span>
-                        <h3 className="text-lg font-bold mt-1 text-gray-900 dark:text-white">
+                        <h3 className="text-lg font-black text-white uppercase mt-0.5">
                           {item.product?.name}
                         </h3>
-                        <p className="text-xs text-gray-500">{item.product?.category}</p>
+                        <span className="text-[10px] text-[#888894]">CATEGORY: {item.product?.category}</span>
                       </div>
                       <div className="text-right">
-                        <span className="text-2xl font-black text-red-600 dark:text-red-400">
+                        <span className="text-3xl font-black text-[#ff2b2b]">
                           {item.current_stock}
                         </span>
-                        <span className="text-xs text-gray-500 block">/ min {item.low_stock_threshold} {item.product?.unit}</span>
+                        <span className="text-[10px] text-[#666675] block uppercase">
+                          / MIN {item.low_stock_threshold} {item.product?.unit}
+                        </span>
                       </div>
                     </div>
 
-                    {/* Stock level progress */}
-                    <div className="w-full bg-gray-200 dark:bg-gray-800 h-2 rounded-full mt-4 overflow-hidden">
+                    <div className="w-full bg-[#201115] h-2.5 mt-3 border border-[#ff2b2b]/30">
                       <div
-                        className="bg-red-500 h-full rounded-full transition-all"
+                        className="bg-[#ff2b2b] h-full"
                         style={{
                           width: `${Math.min(100, (item.current_stock / item.low_stock_threshold) * 100)}%`,
                         }}
@@ -170,10 +162,9 @@ export default function RetailerDashboard() {
 
                   <button
                     onClick={() => handleOpenRestock(item)}
-                    className="mt-5 w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm transition-colors"
+                    className="mt-4 w-full bg-[#ff2b2b] hover:bg-[#e02020] text-white text-xs font-black py-2.5 px-3 uppercase tracking-wider flex items-center justify-center gap-2 transition-colors"
                   >
-                    <ShoppingBag className="w-4 h-4" />
-                    <span>Compare Nearby Suppliers</span>
+                    <span>[COMPARE WHOLESALE & FARM GATE]</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -182,84 +173,86 @@ export default function RetailerDashboard() {
           </section>
         )}
 
-        {/* Full Inventory Monitor */}
-        <section className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl p-6 shadow-xs">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-gray-100 dark:border-gray-800">
+        {/* Real-time Inventory Telemetry Matrix */}
+        <section className="bg-[#0e0e13] border border-[#242430] p-5 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#1c1c24] pb-3">
             <div>
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white">Store Inventory Monitor</h2>
-              <p className="text-xs text-gray-500">Real-time stock counts with automated reorder thresholds</p>
+              <h2 className="text-sm font-black text-white uppercase tracking-wider">
+                COMMODITY STOCK TELEMETRY // CURRENT BALANCE
+              </h2>
+              <p className="text-[10px] text-[#666675]">Real-time shelf metrics with automatic threshold triggers</p>
             </div>
-
-            <div className="flex items-center gap-2 text-xs text-gray-500">
-              <span className="inline-block w-2.5 h-2.5 rounded-full bg-green-500" /> Healthy
-              <span className="inline-block w-2.5 h-2.5 rounded-full bg-red-500 ml-2" /> Low Stock
+            <div className="flex items-center gap-3 text-[10px] text-[#888894]">
+              <span>TOTAL SKUs: {inventory.length}</span>
+              <span>•</span>
+              <span className="text-[#ff2b2b]">SHORTAGES: {lowStockItems.length}</span>
             </div>
           </div>
 
-          <div className="overflow-x-auto mt-4">
-            <table className="w-full text-left text-sm">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
               <thead>
-                <tr className="text-xs uppercase text-gray-400 border-b border-gray-100 dark:border-gray-800">
-                  <th className="pb-3 font-semibold">Product</th>
-                  <th className="pb-3 font-semibold">Category</th>
-                  <th className="pb-3 font-semibold">Current Stock</th>
-                  <th className="pb-3 font-semibold">Threshold</th>
-                  <th className="pb-3 font-semibold">Status</th>
-                  <th className="pb-3 font-semibold text-right">Quick Action</th>
+                <tr className="text-[10px] text-[#666675] uppercase border-b border-[#20202a]">
+                  <th className="pb-2 font-bold">COMMODITY</th>
+                  <th className="pb-2 font-bold">CATEGORY</th>
+                  <th className="pb-2 font-bold">CURRENT STOCK</th>
+                  <th className="pb-2 font-bold">MIN THRESHOLD</th>
+                  <th className="pb-2 font-bold">STATUS</th>
+                  <th className="pb-2 font-bold text-right">ACTION</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+              <tbody className="divide-y divide-[#181820]">
                 {inventory.map((inv) => {
                   const isLow = inv.current_stock <= inv.low_stock_threshold
                   return (
-                    <tr key={inv.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors">
-                      <td className="py-3.5 font-bold text-gray-900 dark:text-white">
+                    <tr key={inv.id} className="hover:bg-[#14141c] transition-colors">
+                      <td className="py-3 font-bold text-white uppercase">
                         {inv.product?.name}
                       </td>
-                      <td className="py-3.5 text-xs text-gray-500">{inv.product?.category}</td>
-                      <td className="py-3.5">
+                      <td className="py-3 text-[11px] text-[#787884]">{inv.product?.category}</td>
+                      <td className="py-3 font-black">
                         <div className="flex items-center gap-2">
-                          <span className={`font-black ${isLow ? 'text-red-600' : 'text-gray-900 dark:text-white'}`}>
+                          <span className={isLow ? 'text-[#ff2b2b] text-sm' : 'text-white text-sm'}>
                             {inv.current_stock} {inv.product?.unit}
                           </span>
-                          <div className="flex items-center gap-1">
+                          <div className="inline-flex items-center gap-1">
                             <button
                               onClick={() => updateInventoryStock(inv.product_id, -5)}
-                              className="w-5 h-5 rounded bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 text-xs flex items-center justify-center"
+                              className="px-1.5 py-0.5 bg-[#1a1a22] hover:bg-[#252530] text-[10px] text-white border border-[#2d2d38]"
                               title="Sell 5 units"
                             >
-                              -
+                              -5
                             </button>
                             <button
                               onClick={() => updateInventoryStock(inv.product_id, 5)}
-                              className="w-5 h-5 rounded bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 text-xs flex items-center justify-center"
+                              className="px-1.5 py-0.5 bg-[#1a1a22] hover:bg-[#252530] text-[10px] text-white border border-[#2d2d38]"
                               title="Add 5 units"
                             >
-                              +
+                              +5
                             </button>
                           </div>
                         </div>
                       </td>
-                      <td className="py-3.5 text-xs text-gray-500">
+                      <td className="py-3 text-[11px] text-[#787884]">
                         {inv.low_stock_threshold} {inv.product?.unit}
                       </td>
-                      <td className="py-3.5">
+                      <td className="py-3">
                         {isLow ? (
-                          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-red-600 bg-red-50 dark:bg-red-950 px-2 py-0.5 rounded-md">
-                            <AlertTriangle className="w-3 h-3" /> Low Stock
+                          <span className="text-[10px] font-black text-[#ff2b2b] bg-[#ff2b2b]/10 border border-[#ff2b2b]/40 px-2 py-0.5 uppercase">
+                            CRITICAL
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-green-700 bg-green-50 dark:bg-green-950 px-2 py-0.5 rounded-md">
-                            <CheckCircle className="w-3 h-3" /> Healthy
+                          <span className="text-[10px] font-black text-[#d2ff00] bg-[#d2ff00]/10 border border-[#d2ff00]/40 px-2 py-0.5 uppercase">
+                            NOMINAL
                           </span>
                         )}
                       </td>
-                      <td className="py-3.5 text-right">
+                      <td className="py-3 text-right">
                         <button
                           onClick={() => handleOpenRestock(inv)}
-                          className="px-3 py-1 rounded-lg bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-300 hover:bg-green-100 font-semibold text-xs transition-colors"
+                          className="px-3 py-1 bg-[#d2ff00] hover:bg-[#b8e000] text-black font-black text-[11px] uppercase tracking-wider transition-colors"
                         >
-                          Restock
+                          RESTOCK »
                         </button>
                       </td>
                     </tr>
@@ -270,72 +263,56 @@ export default function RetailerDashboard() {
           </div>
         </section>
 
-        {/* Live Orders & Delivery Tracker */}
-        <section className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl p-6 shadow-xs">
-          <div className="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-gray-800">
+        {/* Live Orders & Boda Telemetry */}
+        <section className="bg-[#0e0e13] border border-[#242430] p-5 space-y-4">
+          <div className="flex items-center justify-between border-b border-[#1c1c24] pb-3">
             <div>
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white">Recent Orders & Boda Tracking</h2>
-              <p className="text-xs text-gray-500">Live order lifecycle from placement to counter delivery</p>
+              <h2 className="text-sm font-black text-white uppercase tracking-wider">
+                BODA DISPATCH LIFECYCLE // LIVE TRANSIT FEED
+              </h2>
+              <p className="text-[10px] text-[#666675]">Real-time carrier assignment and delivery completion telemetry</p>
             </div>
-            <span className="text-xs text-gray-500 font-medium">{orders.length} orders total</span>
+            <span className="text-[10px] text-[#ff6b00] font-bold">[ORDERS: {orders.length}]</span>
           </div>
 
-          <div className="space-y-4 mt-6">
+          <div className="space-y-3">
             {orders.length === 0 ? (
-              <p className="text-xs text-gray-400 py-6 text-center">No orders placed yet.</p>
+              <p className="text-xs text-[#555562] py-4 text-center">NO RECENT DISPATCH ORDERS LOGGED</p>
             ) : (
               orders.map((ord) => {
-                const statusStyles: Record<string, { label: string; color: string; badge: string }> = {
-                  pending: { label: 'Awaiting Supplier Confirmation', color: 'text-amber-600', badge: 'bg-amber-50 text-amber-700 border-amber-200' },
-                  confirmed: { label: 'Confirmed • Dispatching Boda', color: 'text-blue-600', badge: 'bg-blue-50 text-blue-700 border-blue-200' },
-                  assigned: { label: 'Boda Assigned & Heading to Supplier', color: 'text-indigo-600', badge: 'bg-indigo-50 text-indigo-700 border-indigo-200' },
-                  picked_up: { label: 'Picked Up by Boda', color: 'text-purple-600', badge: 'bg-purple-50 text-purple-700 border-purple-200' },
-                  in_transit: { label: 'Boda In Transit (Arriving in ~3 min)', color: 'text-orange-600', badge: 'bg-orange-50 text-orange-700 border-orange-200' },
-                  delivered: { label: 'Delivered • Inventory Restocked', color: 'text-green-600', badge: 'bg-green-50 text-green-700 border-green-200' },
+                const statusTheme: Record<string, { label: string; text: string; bg: string }> = {
+                  pending: { label: 'AWAITING SUPPLIER CONFIRMATION', text: 'text-[#ff6b00]', bg: 'bg-[#ff6b00]/15 border-[#ff6b00]/40' },
+                  confirmed: { label: 'CONFIRMED // BROADCASTING BODA DISPATCH', text: 'text-blue-400', bg: 'bg-blue-950/40 border-blue-500/40' },
+                  assigned: { label: 'BODA EN ROUTE TO SUPPLIER PICKUP', text: 'text-indigo-400', bg: 'bg-indigo-950/40 border-indigo-500/40' },
+                  picked_up: { label: 'CARGO LOADED ON BODA', text: 'text-purple-400', bg: 'bg-purple-950/40 border-purple-500/40' },
+                  in_transit: { label: 'IN TRANSIT TO KIOSK (ETA ~3 MIN)', text: 'text-[#ff6b00]', bg: 'bg-[#ff6b00]/20 border-[#ff6b00]' },
+                  delivered: { label: 'DELIVERED // INVENTORY REPLENISHED', text: 'text-[#d2ff00]', bg: 'bg-[#d2ff00]/15 border-[#d2ff00]/40' },
                 }
-                const st = statusStyles[ord.status] || { label: ord.status, color: 'text-gray-600', badge: 'bg-gray-100 text-gray-700 border-gray-200' }
+                const st = statusTheme[ord.status] || { label: ord.status, text: 'text-white', bg: 'bg-[#181820] border-[#2c2c36]' }
 
                 return (
                   <div
                     key={ord.id}
-                    className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 hover:border-green-300 dark:hover:border-green-800 transition-all bg-gray-50/40 dark:bg-gray-800/30"
+                    className="p-4 bg-[#111116] border border-[#22222a] flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                   >
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 flex items-center justify-center font-black text-sm">
-                          <Truck className="w-5 h-5" />
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="font-bold text-sm text-gray-900 dark:text-white">Order #{ord.id}</span>
-                            <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full border ${st.badge}`}>
-                              {ord.status.toUpperCase()}
-                            </span>
-                          </div>
-                          <p className="text-xs text-gray-500 mt-0.5">
-                            {ord.quantity} {ord.product?.unit} {ord.product?.name} from <span className="font-medium text-gray-700 dark:text-gray-300">{ord.supplier?.business_name}</span>
-                          </p>
-                        </div>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-black text-white">#{ord.id}</span>
+                        <span className={`text-[10px] font-black px-2 py-0.5 border ${st.bg} ${st.text}`}>
+                          {st.label}
+                        </span>
                       </div>
-
-                      <div className="text-right">
-                        <p className="text-base font-black text-gray-900 dark:text-white">
-                          KSh {ord.total_amount?.toLocaleString()}
-                        </p>
-                        <p className="text-[11px] text-gray-500">
-                          (Item: KSh {ord.quantity * ord.unit_price} + Delivery: KSh {ord.delivery_fee})
-                        </p>
-                      </div>
+                      <p className="text-xs text-[#a0a0ae]">
+                        {ord.quantity} {ord.product?.unit} {ord.product?.name} from <span className="text-white font-bold">{ord.supplier?.business_name}</span>
+                      </p>
                     </div>
 
-                    {/* Progress Stepper Bar */}
-                    <div className="mt-4 pt-3 border-t border-gray-200/60 dark:border-gray-800 flex items-center justify-between text-xs text-gray-500">
-                      <div className="flex items-center gap-2">
-                        <Clock className="w-3.5 h-3.5 text-green-600" />
-                        <span className={`font-semibold ${st.color}`}>{st.label}</span>
-                      </div>
-                      <span className="text-[11px] text-gray-400">
-                        Placed at {new Date(ord.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    <div className="text-right">
+                      <span className="text-base font-black text-[#d2ff00]">
+                        KSh {ord.total_amount?.toLocaleString()}
+                      </span>
+                      <span className="text-[10px] text-[#666675] block">
+                        ITEM: KSh {ord.quantity * ord.unit_price} + BODA: KSh {ord.delivery_fee}
                       </span>
                     </div>
                   </div>
@@ -346,147 +323,125 @@ export default function RetailerDashboard() {
         </section>
       </main>
 
-      {/* Restock & Supplier Comparison Modal */}
+      {/* Supplier Comparison & Requisition Modal */}
       {selectedRestockItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-150">
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-xs p-4 font-mono">
+          <div className="bg-[#0d0d12] border-2 border-[#333342] max-w-3xl w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
-            <div className="flex items-start justify-between pb-4 border-b border-gray-100 dark:border-gray-800">
+            <div className="flex items-start justify-between pb-3 border-b border-[#242430]">
               <div>
-                <span className="text-xs font-bold text-green-600 uppercase tracking-wider">
-                  Verified Local Suppliers
+                <span className="text-[10px] font-black text-[#d2ff00] uppercase tracking-wider">
+                  COMMODITY SOURCING MATRIX // REAL-TIME LOGISTICS
                 </span>
-                <h3 className="text-xl font-black text-gray-900 dark:text-white mt-0.5">
-                  Restock {selectedRestockItem.product?.name}
+                <h3 className="text-xl font-black text-white uppercase mt-0.5">
+                  REQUISITION: {selectedRestockItem.product?.name}
                 </h3>
-                <p className="text-xs text-gray-500">
-                  Current stock: {selectedRestockItem.current_stock} {selectedRestockItem.product?.unit} (Threshold: {selectedRestockItem.low_stock_threshold} {selectedRestockItem.product?.unit})
-                </p>
+                <span className="text-[11px] text-[#787884]">
+                  ON HAND: {selectedRestockItem.current_stock} {selectedRestockItem.product?.unit} • THRESHOLD: {selectedRestockItem.low_stock_threshold} {selectedRestockItem.product?.unit}
+                </span>
               </div>
               <button
                 onClick={() => setSelectedRestockItem(null)}
-                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-2 rounded-xl"
+                className="text-[#666675] hover:text-white px-2 py-1 text-xs border border-[#252530]"
               >
-                ✕
+                [ESC / CLOSE]
               </button>
             </div>
 
-            {/* Quantity Input */}
-            <div className="py-4 border-b border-gray-100 dark:border-gray-800">
-              <label className="text-xs font-bold text-gray-700 dark:text-gray-300 block mb-1">
-                Order Quantity ({selectedRestockItem.product?.unit})
-              </label>
-              <div className="flex items-center gap-3">
+            {/* Quantity Selector */}
+            <div className="p-3 bg-[#13131a] border border-[#22222d] flex items-center justify-between gap-4">
+              <div>
+                <span className="text-[10px] text-[#787884] uppercase block">REORDER VOLUME ({selectedRestockItem.product?.unit}):</span>
                 <input
                   type="number"
                   min="5"
                   value={orderQuantity}
                   onChange={(e) => setOrderQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                  className="w-32 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-800 font-bold text-center text-base"
+                  className="w-28 bg-[#0a0a0e] border border-[#2a2a38] text-white font-black text-center py-1.5 text-base mt-1"
                 />
-                <div className="flex items-center gap-1.5">
-                  {[25, 50, 100, 200].map((q) => (
-                    <button
-                      key={q}
-                      onClick={() => setOrderQuantity(q)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold border ${
-                        orderQuantity === q
-                          ? 'bg-green-600 text-white border-green-600'
-                          : 'border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300'
-                      }`}
-                    >
-                      {q} {selectedRestockItem.product?.unit}
-                    </button>
-                  ))}
-                </div>
+              </div>
+
+              <div className="flex items-center gap-1.5">
+                {[25, 50, 100, 200].map((q) => (
+                  <button
+                    key={q}
+                    onClick={() => setOrderQuantity(q)}
+                    className={`px-3 py-1.5 text-xs font-bold border transition-colors ${
+                      orderQuantity === q
+                        ? 'bg-[#d2ff00] text-black border-[#d2ff00]'
+                        : 'bg-[#0a0a0e] text-[#8e8e9c] border-[#22222d] hover:text-white'
+                    }`}
+                  >
+                    {q} {selectedRestockItem.product?.unit}
+                  </button>
+                ))}
               </div>
             </div>
 
-            {/* Success banner */}
+            {/* Status confirmation */}
             {orderSuccessMessage && (
-              <div className="my-4 p-4 rounded-2xl bg-green-50 dark:bg-green-950/50 border border-green-200 dark:border-green-800 flex items-center gap-3 text-green-800 dark:text-green-200">
-                <CheckCircle className="w-5 h-5 text-green-600 shrink-0" />
-                <p className="text-xs font-semibold">{orderSuccessMessage}</p>
+              <div className="p-3 bg-[#0f1b0c] border-2 border-[#2b5a15] text-[#b8f596] text-xs font-bold">
+                {orderSuccessMessage}
               </div>
             )}
 
-            {/* Suppliers Comparison List */}
-            <div className="py-4 space-y-3">
-              <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider">
-                Available Nearby Wholesalers & Farmers ({relevantListings.length} found)
-              </h4>
+            {/* Comparison Grid */}
+            <div className="space-y-3">
+              <span className="text-[10px] text-[#666675] font-black uppercase tracking-wider block">
+                AVAILABLE VERIFIED SOURCES ({relevantListings.length} DEPOTS / FARMS INDEXED):
+              </span>
 
-              {relevantListings.length === 0 ? (
-                <p className="text-xs text-gray-400 py-6 text-center">
-                  No active suppliers currently listing this item.
-                </p>
-              ) : (
-                relevantListings.map((list) => {
-                  const itemTotal = list.price_per_unit * orderQuantity
-                  const deliveryFee = list.total_delivery_fee || Math.round(list.distance_km! * 50)
-                  const grandTotal = itemTotal + deliveryFee
-                  const isFarmer = list.supplier?.role === 'farmer'
+              {relevantListings.map((list) => {
+                const itemTotal = list.price_per_unit * orderQuantity
+                const deliveryFee = list.total_delivery_fee || Math.round(list.distance_km! * 50)
+                const grandTotal = itemTotal + deliveryFee
+                const isFarmer = list.supplier?.role === 'farmer'
 
-                  return (
-                    <div
-                      key={list.id}
-                      className="border border-gray-200 dark:border-gray-800 rounded-2xl p-4 hover:border-green-500 dark:hover:border-green-500 transition-all bg-white dark:bg-gray-900 shadow-xs"
-                    >
-                      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <span
-                              className={`text-[10px] font-black uppercase px-2 py-0.5 rounded ${
-                                isFarmer
-                                  ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300'
-                                  : 'bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300'
-                              }`}
-                            >
-                              {isFarmer ? 'Direct Farm' : 'Wholesaler'}
-                            </span>
-                            <h5 className="font-bold text-gray-900 dark:text-white">
-                              {list.supplier?.business_name}
-                            </h5>
-                          </div>
-
-                          <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500 mt-2">
-                            <span className="flex items-center gap-1">
-                              <MapPin className="w-3.5 h-3.5 text-gray-400" />
-                              {list.distance_km} km away ({list.supplier?.address})
-                            </span>
-                            <span>• Stock: {list.available_stock} {list.unit}</span>
-                            <span>• Rate: KSh {list.price_per_unit}/{list.unit}</span>
-                          </div>
-                        </div>
-
-                        {/* Price Breakdown */}
-                        <div className="text-right sm:border-l sm:border-gray-100 dark:sm:border-gray-800 sm:pl-4">
-                          <span className="text-xs text-gray-400 block">Total Est. Cost</span>
-                          <span className="text-lg font-black text-green-700 dark:text-green-400">
-                            KSh {grandTotal.toLocaleString()}
-                          </span>
-                          <span className="text-[10px] text-gray-500 block">
-                            Includes KSh {deliveryFee} boda delivery
-                          </span>
-                        </div>
+                return (
+                  <div
+                    key={list.id}
+                    className="p-4 bg-[#111116] border border-[#242430] hover:border-[#d2ff00] transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                  >
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className={`text-[9px] font-black px-1.5 py-0.5 uppercase ${
+                          isFarmer ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-blue-950 text-blue-400 border border-blue-800'
+                        }`}>
+                          {isFarmer ? 'DIRECT FARM GATE' : 'WHOLESALE DEPOT'}
+                        </span>
+                        <h4 className="font-black text-white text-sm uppercase">
+                          {list.supplier?.business_name}
+                        </h4>
                       </div>
 
-                      <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
-                        <span className="text-xs text-gray-500">
-                          Est. Delivery: ~35-45 mins via Boda Express
-                        </span>
-                        <button
-                          onClick={() => handlePlaceOrder(list)}
-                          className="bg-green-600 hover:bg-green-700 text-white text-xs font-bold py-2 px-4 rounded-xl flex items-center gap-1.5 transition-colors shadow-xs"
-                        >
-                          <span>Confirm & Order</span>
-                          <ChevronRight className="w-4 h-4" />
-                        </button>
+                      <div className="text-[11px] text-[#888894] flex flex-wrap gap-3">
+                        <span>DISTANCE: {list.distance_km} KM ({list.supplier?.address})</span>
+                        <span>STOCK: {list.available_stock} {list.unit}</span>
+                        <span className="text-[#d2ff00]">RATE: KSH {list.price_per_unit}/{list.unit}</span>
                       </div>
                     </div>
-                  )
-                })
-              )}
+
+                    <div className="flex items-center gap-4 sm:border-l sm:border-[#22222c] sm:pl-4">
+                      <div className="text-right">
+                        <span className="text-[10px] text-[#666675] uppercase block">TOTAL INVOICE</span>
+                        <span className="text-xl font-black text-[#d2ff00]">
+                          KSh {grandTotal.toLocaleString()}
+                        </span>
+                        <span className="text-[9px] text-[#777784] block">
+                          INC. KSH {deliveryFee} BODA CARRIER
+                        </span>
+                      </div>
+
+                      <button
+                        onClick={() => handlePlaceOrder(list)}
+                        className="px-4 py-2.5 bg-[#d2ff00] hover:bg-[#b8e000] text-black font-black text-xs uppercase tracking-wider transition-colors"
+                      >
+                        CONFIRM & REQUISITION »
+                      </button>
+                    </div>
+                  </div>
+                )
+              })}
             </div>
           </div>
         </div>

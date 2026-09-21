@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { Mic, MicOff, Volume2, X, Sparkles, CheckCircle2, AlertCircle } from 'lucide-react'
+import { Mic, MicOff, Volume2, X, Terminal, Radio, ShieldCheck, Activity } from 'lucide-react'
 import { useAppStore } from '@/store'
 
 interface VoiceAssistantProps {
@@ -11,36 +11,31 @@ interface VoiceAssistantProps {
 
 export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
   const {
-    currentRole,
     inventory,
     listings,
     products,
     createOrder,
     switchRole,
-    updateInventoryStock,
   } = useAppStore()
 
   const [isListening, setIsListening] = useState(false)
   const [transcript, setTranscript] = useState('')
   const [responseMessage, setResponseMessage] = useState('')
   const [isSpeaking, setIsSpeaking] = useState(false)
-  const [status, setStatus] = useState<'idle' | 'listening' | 'processing' | 'speaking'>('idle')
+  const [status, setStatus] = useState<'IDLE' | 'LISTENING' | 'PARSING' | 'SYNTHESIZING'>('IDLE')
 
   const recognitionRef = useRef<any>(null)
 
-  // Natural speech playback using SpeechSynthesis with ElevenLabs fallback
   const speakText = useCallback((text: string) => {
     if (typeof window === 'undefined') return
-    setStatus('speaking')
+    setStatus('SYNTHESIZING')
     setIsSpeaking(true)
 
-    // Stop existing speech
     window.speechSynthesis.cancel()
 
     const utterance = new SpeechSynthesisUtterance(text)
     utterance.rate = 1.05
-    utterance.pitch = 1.0
-    // Try to pick an English voice
+    utterance.pitch = 0.95
     const voices = window.speechSynthesis.getVoices()
     const preferredVoice =
       voices.find((v) => v.lang === 'en-GB' || v.lang === 'en-US' || v.lang.startsWith('en')) || voices[0]
@@ -48,66 +43,62 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
 
     utterance.onend = () => {
       setIsSpeaking(false)
-      setStatus('idle')
+      setStatus('IDLE')
     }
     utterance.onerror = () => {
       setIsSpeaking(false)
-      setStatus('idle')
+      setStatus('IDLE')
     }
 
     window.speechSynthesis.speak(utterance)
   }, [])
 
-  // Process natural language commands
   const processCommand = useCallback(
     (rawText: string) => {
       const text = rawText.toLowerCase().trim()
-      setStatus('processing')
+      setStatus('PARSING')
 
-      // 1. Order command: "order 50kg maize", "buy 20 kg beans", "order 30 maize"
+      // 1. Order command: "order 50kg maize", "buy 20 kg beans"
       const orderMatch = text.match(/(?:order|buy|get|purchase)\s+(\d+)\s*(?:kg|kilos?|litres?|trays?)?\s*(?:of\s+)?([a-z\s]+)/i)
       if (orderMatch) {
         const qty = parseInt(orderMatch[1], 10)
         const rawProd = orderMatch[2].trim()
 
-        // Match product in catalog
         const product = products.find((p) =>
           p.name.toLowerCase().includes(rawProd) || rawProd.includes(p.name.toLowerCase().split(' ')[0])
         )
 
         if (product) {
-          // Find best supplier (cheapest total cost)
           const availListings = listings.filter((l) => l.product_id === product.id && l.is_active)
           if (availListings.length > 0) {
-            // Sort by total price
             availListings.sort((a, b) => a.price_per_unit * qty + (a.total_delivery_fee || 0) - (b.price_per_unit * qty + (b.total_delivery_fee || 0)))
             const best = availListings[0]
             const order = createOrder({
               productId: product.id,
               supplierId: best.supplier_id,
               quantity: qty,
-              notes: 'Voice placed order via Supplier Hub Assistant',
+              notes: 'Tactical Voice HUD requisition',
             })
 
-            const reply = `Order confirmed! I have placed an order for ${qty} ${product.unit} of ${product.name} from ${best.supplier?.business_name} at Kenyan Shillings ${best.price_per_unit} per ${product.unit}. Total including delivery is KSh ${order.total_amount.toLocaleString()}. A boda rider will be dispatched shortly.`
+            const reply = `Order SH-${order.id.slice(-4)} logged. Sourced ${qty} ${product.unit} ${product.name} from ${best.supplier?.business_name} at KSh ${best.price_per_unit}/${product.unit}. Total invoice KSh ${order.total_amount.toLocaleString()}. Boda dispatch broadcast initiated.`
             setResponseMessage(reply)
             speakText(reply)
             return
           } else {
-            const reply = `I found ${product.name}, but there are currently no active suppliers listed nearby.`
+            const reply = `Commodity ${product.name} detected, but zero active depot listings in current transit radius.`
             setResponseMessage(reply)
             speakText(reply)
             return
           }
         } else {
-          const reply = `I couldn't identify the product "${rawProd}". We have maize, beans, rice, tomatoes, onions, and potatoes available.`
+          const reply = `Commodity "${rawProd}" not indexed. Supported items: Maize, Beans, Rice, Tomatoes, Red Onions, Potatoes, Milk, Eggs.`
           setResponseMessage(reply)
           speakText(reply)
           return
         }
       }
 
-      // 2. Stock check: "check stock of maize", "how much tomatoes do i have"
+      // 2. Stock check
       const stockMatch = text.match(/(?:check stock|stock of|how much|inventory of|do i have)\s*([a-z\s]+)/i)
       if (stockMatch) {
         const rawProd = stockMatch[1].trim()
@@ -117,16 +108,16 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
         if (invItem && invItem.product) {
           const isLow = invItem.current_stock <= invItem.low_stock_threshold
           const alertPart = isLow
-            ? `Warning: stock is below your minimum threshold of ${invItem.low_stock_threshold} ${invItem.product.unit}. Would you like me to order more?`
-            : `Stock level is healthy.`
-          const reply = `You have ${invItem.current_stock} ${invItem.product.unit} of ${invItem.product.name} in stock. ${alertPart}`
+            ? `Warning: Below minimum threshold of ${invItem.low_stock_threshold} ${invItem.product.unit}. Immediate restock advised.`
+            : `Inventory level nominal.`
+          const reply = `Current balance: ${invItem.current_stock} ${invItem.product.unit} ${invItem.product.name}. ${alertPart}`
           setResponseMessage(reply)
           speakText(reply)
           return
         }
       }
 
-      // 3. Find suppliers: "who sells tomatoes", "find supplier for beans"
+      // 3. Find suppliers
       const supplierMatch = text.match(/(?:who sells|find supplier|supplier for|sellers of)\s*([a-z\s]+)/i)
       if (supplierMatch) {
         const rawProd = supplierMatch[1].trim()
@@ -137,7 +128,7 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
           const matchingListings = listings.filter((l) => l.product_id === product.id)
           if (matchingListings.length > 0) {
             const top = matchingListings[0]
-            const reply = `We have ${matchingListings.length} suppliers for ${product.name}. Top match is ${top.supplier?.business_name} at KSh ${top.price_per_unit} per ${product.unit}, located ${top.distance_km} kilometers away.`
+            const reply = `Located ${matchingListings.length} suppliers for ${product.name}. Optimal: ${top.supplier?.business_name} at KSh ${top.price_per_unit} per ${product.unit}, distance ${top.distance_km} kilometers.`
             setResponseMessage(reply)
             speakText(reply)
             return
@@ -145,38 +136,38 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
         }
       }
 
-      // 4. Role switch: "switch to boda", "switch to wholesaler", "switch to retailer"
+      // 4. Role switch
       if (text.includes('boda')) {
         switchRole('boda_rider')
-        const reply = 'Switched persona to Boda Rider: James Otieno. Ready to accept deliveries.'
+        const reply = 'Persona routed to Boda Logistics: James Otieno.'
         setResponseMessage(reply)
         speakText(reply)
         return
       }
       if (text.includes('wholesaler')) {
         switchRole('wholesaler')
-        const reply = 'Switched persona to Wholesaler: Kilimo Traders. Ready to view orders and manage inventory.'
+        const reply = 'Persona routed to Wholesale Depot: Kilimo Traders.'
         setResponseMessage(reply)
         speakText(reply)
         return
       }
       if (text.includes('farmer')) {
         switchRole('farmer')
-        const reply = 'Switched persona to Farmer: Green Valley Co-op.'
+        const reply = 'Persona routed to Farm Gate: Green Valley Co-op.'
         setResponseMessage(reply)
         speakText(reply)
         return
       }
       if (text.includes('retailer')) {
         switchRole('retailer')
-        const reply = 'Switched persona to Retailer: Mama Sarah Fresh Kiosk.'
+        const reply = 'Persona routed to Retail Operations: Mama Sarah Fresh Kiosk.'
         setResponseMessage(reply)
         speakText(reply)
         return
       }
 
       // Fallback
-      const fallback = `I heard: "${rawText}". Try saying "Order 50kg maize", "Check stock of tomatoes", or "Who sells beans".`
+      const fallback = `Input captured: "${rawText}". Issue voice instructions like: "Order 50kg maize", "Check stock of tomatoes", or "Who sells beans".`
       setResponseMessage(fallback)
       speakText(fallback)
     },
@@ -191,18 +182,18 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
 
     const SpeechRec = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
     if (!SpeechRec) {
-      setResponseMessage('Web Speech API is not supported in this browser. Please use Chrome or Edge, or type below.')
+      setResponseMessage('Web Speech API not supported in this client. Use prompt buttons below.')
       return
     }
 
     const recognition = new SpeechRec()
     recognition.continuous = false
     recognition.interimResults = true
-    recognition.lang = 'en-KE' // Kenyan English locale
+    recognition.lang = 'en-KE'
 
     recognition.onstart = () => {
       setIsListening(true)
-      setStatus('listening')
+      setStatus('LISTENING')
     }
 
     recognition.onresult = (event: any) => {
@@ -222,10 +213,9 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
       }
     }
 
-    recognition.onerror = (event: any) => {
-      console.warn('Speech recognition error:', event.error)
+    recognition.onerror = () => {
       setIsListening(false)
-      setStatus('idle')
+      setStatus('IDLE')
     }
 
     recognition.onend = () => {
@@ -245,10 +235,9 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
       recognitionRef.current.stop()
     }
     setIsListening(false)
-    setStatus('idle')
+    setStatus('IDLE')
   }
 
-  // Quick preset voice triggers for testing/demo without mic
   const triggerSample = (phrase: string) => {
     setTranscript(phrase)
     processCommand(phrase)
@@ -257,115 +246,127 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-      <div className="relative w-full max-w-lg bg-white dark:bg-gray-900 border border-green-200 dark:border-gray-800 rounded-3xl shadow-2xl overflow-hidden p-6">
-        {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-gray-800">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-xs p-4 font-mono">
+      <div className="relative w-full max-w-xl bg-[#0c0c10] border-2 border-[#333340] text-[#e2e2e8] shadow-2xl p-6">
+        {/* Terminal Header */}
+        <div className="flex items-center justify-between pb-3 border-b border-[#252530]">
           <div className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-green-600 to-emerald-400 flex items-center justify-center text-white shadow-md shadow-green-500/20">
-              <Sparkles className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white">Supplier Hub Voice AI</h3>
-              <p className="text-xs text-gray-500">ElevenLabs & Web Speech API • Swahili / English</p>
-            </div>
+            <span className="w-2.5 h-2.5 bg-[#d2ff00]" />
+            <span className="text-xs font-black tracking-widest text-white uppercase">
+              VOICE DISPATCH TERMINAL // AUDIO_INPUT_01
+            </span>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            className="text-[#666675] hover:text-white px-2 py-1 text-xs font-bold border border-[#252530] hover:border-[#444455]"
           >
-            <X className="w-5 h-5" />
+            [ESC / CLOSE]
           </button>
         </div>
 
-        {/* Dynamic Voice Visualizer */}
-        <div className="py-8 flex flex-col items-center justify-center">
-          <div className="relative mb-6">
-            {/* Animated rings when listening/speaking */}
-            {(isListening || isSpeaking) && (
-              <>
-                <span className="absolute -inset-4 rounded-full bg-green-500/20 animate-ping" />
-                <span className="absolute -inset-8 rounded-full bg-green-500/10 animate-pulse" />
-              </>
-            )}
+        {/* Audio Visualizer & Frequency Simulation */}
+        <div className="py-6 flex flex-col items-center justify-center">
+          <div className="w-full bg-[#070709] border border-[#202028] p-4 mb-5">
+            <div className="flex items-center justify-between text-[10px] text-[#777785] pb-2 border-b border-[#181820] mb-3">
+              <span>INPUT STATUS: <strong className={status === 'LISTENING' ? 'text-[#d2ff00]' : 'text-white'}>[{status}]</strong></span>
+              <span>SAMPLING: 44.1kHz • EN-KE</span>
+              <span>LOC: NAIROBI_CORRIDOR</span>
+            </div>
 
-            <button
-              onClick={isListening ? stopListening : startListening}
-              className={`relative z-10 w-24 h-24 rounded-full flex items-center justify-center shadow-xl transition-all duration-300 ${
-                isListening
-                  ? 'bg-red-500 hover:bg-red-600 text-white scale-105 shadow-red-500/30'
-                  : isSpeaking
-                  ? 'bg-emerald-600 text-white shadow-emerald-500/30'
-                  : 'bg-green-600 hover:bg-green-700 text-white shadow-green-600/30'
-              }`}
-            >
-              {isListening ? (
-                <MicOff className="w-10 h-10 animate-pulse" />
-              ) : isSpeaking ? (
-                <Volume2 className="w-10 h-10 animate-bounce" />
-              ) : (
-                <Mic className="w-10 h-10" />
-              )}
-            </button>
+            {/* Audio bar simulation */}
+            <div className="flex items-end justify-between h-14 gap-1 px-2">
+              {[15, 35, 70, 45, 85, 95, 60, 40, 80, 100, 75, 45, 65, 30, 90, 50, 20, 60, 40, 70].map((h, i) => (
+                <div
+                  key={i}
+                  className={`w-full transition-all duration-100 ${
+                    isListening || isSpeaking
+                      ? 'bg-[#d2ff00]'
+                      : 'bg-[#22222c]'
+                  }`}
+                  style={{
+                    height: isListening || isSpeaking ? `${Math.max(12, Math.round(h * Math.random()))}%` : '8%',
+                  }}
+                />
+              ))}
+            </div>
           </div>
 
-          <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            {status === 'listening' && 'Listening... Speak now'}
-            {status === 'processing' && 'Processing voice intent...'}
-            {status === 'speaking' && 'Speaking audio reply...'}
-            {status === 'idle' && 'Tap the microphone to speak'}
-          </p>
+          <button
+            onClick={isListening ? stopListening : startListening}
+            className={`w-full py-4 border text-sm font-black tracking-widest uppercase transition-all flex items-center justify-center gap-3 ${
+              isListening
+                ? 'bg-[#ff2b2b] text-white border-[#ff2b2b]'
+                : isSpeaking
+                ? 'bg-[#24242e] text-[#d2ff00] border-[#d2ff00]'
+                : 'bg-[#d2ff00] hover:bg-[#bce400] text-black border-[#d2ff00]'
+            }`}
+          >
+            {isListening ? (
+              <>
+                <MicOff className="w-5 h-5 animate-pulse" />
+                <span>[RECORDING... TAP TO TRANSMIT]</span>
+              </>
+            ) : isSpeaking ? (
+              <>
+                <Volume2 className="w-5 h-5 animate-bounce" />
+                <span>[TRANSMITTING AUDIO TELEMETRY]</span>
+              </>
+            ) : (
+              <>
+                <Mic className="w-5 h-5" />
+                <span>[CLICK TO INITIATE VOICE COMMAND]</span>
+              </>
+            )}
+          </button>
 
-          {/* Transcript display */}
+          {/* Transcript telemetry */}
           {transcript && (
-            <div className="mt-4 px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-xl text-center max-w-sm">
-              <span className="text-xs text-gray-400 block mb-1">Transcript</span>
-              <p className="text-sm font-semibold text-gray-900 dark:text-white italic">"{transcript}"</p>
+            <div className="w-full mt-4 p-3 bg-[#111116] border border-[#2a2a35] text-left">
+              <span className="text-[10px] text-[#ff6b00] uppercase block mb-0.5">» RECOGNIZED PHRASE:</span>
+              <p className="text-xs font-bold text-white">"{transcript}"</p>
             </div>
           )}
 
-          {/* Response Message */}
+          {/* Response Telemetry */}
           {responseMessage && (
-            <div className="mt-4 p-4 bg-green-50 dark:bg-green-950/40 border border-green-200 dark:border-green-800 rounded-2xl w-full text-left">
-              <div className="flex items-start gap-2.5">
-                <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400 shrink-0 mt-0.5" />
-                <p className="text-sm text-green-900 dark:text-green-200 leading-relaxed font-medium">
-                  {responseMessage}
-                </p>
-              </div>
+            <div className="w-full mt-3 p-3 bg-[#0a1208] border border-[#2b5015] text-left">
+              <span className="text-[10px] text-[#d2ff00] uppercase block mb-0.5">» SYSTEM DISPATCH CONFIRMATION:</span>
+              <p className="text-xs font-semibold text-[#c8f8a8] leading-relaxed">
+                {responseMessage}
+              </p>
             </div>
           )}
         </div>
 
-        {/* Demo Quick Voice Buttons (Guarantees testing works even without microphone permission) */}
-        <div className="pt-3 border-t border-gray-100 dark:border-gray-800">
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-            Try Demo Voice Prompts (Instant test):
-          </p>
-          <div className="flex flex-wrap gap-2">
+        {/* Demo Fast Triggers */}
+        <div className="pt-3 border-t border-[#202028]">
+          <span className="text-[10px] text-[#666675] uppercase block mb-2 font-bold">
+            // HARDWARE TRIGGER MACROS (TEST WITHOUT MICROPHONE):
+          </span>
+          <div className="grid grid-cols-2 gap-2 text-[11px]">
             <button
               onClick={() => triggerSample('Order 50kg maize from cheapest supplier')}
-              className="text-xs px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-green-100 hover:text-green-700 dark:hover:bg-gray-700 transition-colors"
+              className="p-2 bg-[#14141a] hover:bg-[#1f1f28] border border-[#242430] hover:border-[#d2ff00] text-left text-white"
             >
-              🎙️ "Order 50kg maize"
+              [MACRO 1] » "Order 50kg maize"
             </button>
             <button
               onClick={() => triggerSample('Check stock of tomatoes')}
-              className="text-xs px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-green-100 hover:text-green-700 dark:hover:bg-gray-700 transition-colors"
+              className="p-2 bg-[#14141a] hover:bg-[#1f1f28] border border-[#242430] hover:border-[#d2ff00] text-left text-white"
             >
-              🎙️ "Check stock of tomatoes"
+              [MACRO 2] » "Check stock of tomatoes"
             </button>
             <button
               onClick={() => triggerSample('Find supplier for beans')}
-              className="text-xs px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-green-100 hover:text-green-700 dark:hover:bg-gray-700 transition-colors"
+              className="p-2 bg-[#14141a] hover:bg-[#1f1f28] border border-[#242430] hover:border-[#d2ff00] text-left text-white"
             >
-              🎙️ "Find supplier for beans"
+              [MACRO 3] » "Who sells beans"
             </button>
             <button
               onClick={() => triggerSample('Switch to boda rider')}
-              className="text-xs px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-green-100 hover:text-green-700 dark:hover:bg-gray-700 transition-colors"
+              className="p-2 bg-[#14141a] hover:bg-[#1f1f28] border border-[#242430] hover:border-[#d2ff00] text-left text-white"
             >
-              🎙️ "Switch to boda"
+              [MACRO 4] » "Switch to Boda Dispatch"
             </button>
           </div>
         </div>
