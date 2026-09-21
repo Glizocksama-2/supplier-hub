@@ -23,6 +23,7 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
   const [responseMessage, setResponseMessage] = useState('')
   const [isSpeaking, setIsSpeaking] = useState(false)
   const [status, setStatus] = useState<'IDLE' | 'LISTENING' | 'PARSING' | 'SYNTHESIZING'>('IDLE')
+  const [manualCommand, setManualCommand] = useState('')
 
   const recognitionRef = useRef<any>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
@@ -318,10 +319,8 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
     const recognition = new SpeechRec()
     recognition.continuous = true
     recognition.interimResults = true
-
-    // Use browser language or en-US (en-KE causes instant language-not-supported on Windows Chromium)
-    const browserLang = typeof navigator !== 'undefined' ? navigator.language : 'en-US'
-    recognition.lang = browserLang || 'en-US'
+    // Force en-US for maximum reliability on Chromium speech cloud servers
+    recognition.lang = 'en-US'
 
     recognition.onstart = () => {
       setIsListening(true)
@@ -369,6 +368,10 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
 
       if (err === 'not-allowed' || err === 'service-not-allowed') {
         setResponseMessage('Microphone access blocked. Click the lock/settings icon in the browser address bar to allow.')
+      } else if (err === 'network') {
+        setResponseMessage(
+          'Browser speech cloud blocked by network or browser privacy setting (common in Brave/Edge). Type any command in the prompt below or tap the quick macros to speak!'
+        )
       } else if (err === 'language-not-supported') {
         console.warn('Language not supported, retrying with en-US fallback')
         recognition.lang = 'en-US'
@@ -378,13 +381,13 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
         } catch {}
       } else if (err === 'no-speech') {
         if (!transcriptRef.current) {
-          setResponseMessage('No voice activity detected. Speak into your microphone or tap a prompt button.')
+          setResponseMessage('No voice activity detected. Speak into your microphone, type below, or tap a macro.')
         }
       } else if (err === 'audio-capture') {
         setResponseMessage('No microphone hardware detected. Please connect an audio input device.')
       } else {
         if (!transcriptRef.current) {
-          setResponseMessage(`Voice input stopped: [${err || 'unknown'}]. Tap to retry or use macros.`)
+          setResponseMessage(`Voice input stopped: [${err || 'unknown'}]. You can type your command below or tap a prompt.`)
         }
       }
 
@@ -517,6 +520,36 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
               </>
             )}
           </button>
+
+          {/* Tactical Command Input (Guaranteed fallback for network or browser speech limitations) */}
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              if (!manualCommand.trim()) return
+              const cmd = manualCommand.trim()
+              setTranscript(cmd)
+              setManualCommand('')
+              processCommand(cmd)
+            }}
+            className="w-full mt-3 flex items-center gap-2"
+          >
+            <div className="relative flex-1">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-500 font-bold text-xs">»</span>
+              <input
+                type="text"
+                value={manualCommand}
+                onChange={(e) => setManualCommand(e.target.value)}
+                placeholder="TYPE VOICE COMMAND (e.g. 'Order 50kg maize', 'Who is cheaper?')..."
+                className="w-full bg-[#111318] border border-[#262834] focus:border-blue-500 text-white pl-7 pr-3 py-2.5 text-xs font-mono placeholder:text-[#525666] outline-none transition-colors"
+              />
+            </div>
+            <button
+              type="submit"
+              className="px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-black text-xs uppercase tracking-wider transition-colors shrink-0"
+            >
+              TRANSMIT »
+            </button>
+          </form>
 
           {/* Transcript telemetry */}
           {transcript && (
