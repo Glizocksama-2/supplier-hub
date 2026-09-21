@@ -25,12 +25,10 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
   const [status, setStatus] = useState<'IDLE' | 'LISTENING' | 'PARSING' | 'SYNTHESIZING'>('IDLE')
 
   const recognitionRef = useRef<any>(null)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
 
-  const speakText = useCallback((text: string) => {
+  const speakWithBrowserSpeech = useCallback((text: string) => {
     if (typeof window === 'undefined') return
-    setStatus('SYNTHESIZING')
-    setIsSpeaking(true)
-
     window.speechSynthesis.cancel()
 
     const utterance = new SpeechSynthesisUtterance(text)
@@ -52,6 +50,52 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
 
     window.speechSynthesis.speak(utterance)
   }, [])
+
+  const speakText = useCallback(
+    async (text: string) => {
+      if (typeof window === 'undefined') return
+      setStatus('SYNTHESIZING')
+      setIsSpeaking(true)
+
+      if (audioRef.current) {
+        audioRef.current.pause()
+        audioRef.current = null
+      }
+
+      try {
+        const res = await fetch('/api/tts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text }),
+        })
+
+        if (res.ok) {
+          const audioBlob = await res.blob()
+          const audioUrl = URL.createObjectURL(audioBlob)
+          const audio = new Audio(audioUrl)
+          audioRef.current = audio
+
+          audio.onended = () => {
+            setIsSpeaking(false)
+            setStatus('IDLE')
+            URL.revokeObjectURL(audioUrl)
+          }
+          audio.onerror = () => {
+            URL.revokeObjectURL(audioUrl)
+            speakWithBrowserSpeech(text)
+          }
+
+          await audio.play()
+          return
+        }
+      } catch {
+        // Fallback to browser synthesis
+      }
+
+      speakWithBrowserSpeech(text)
+    },
+    [speakWithBrowserSpeech]
+  )
 
   const processCommand = useCallback(
     (rawText: string) => {
