@@ -12,8 +12,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Text is required' }, { status: 400 })
     }
 
-    // Default to Rachel voice or custom voice
-    const voiceId = voice_id || '21m00Tcm4TlvDq8ikWAM'
+    // Default to Sarah (premade voice compatible with all tiers)
+    const voiceId = voice_id || 'EXAVITQu4vr4xnSDxMaL'
 
     const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
       method: 'POST',
