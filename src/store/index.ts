@@ -166,7 +166,7 @@ export const INITIAL_INVENTORY: RetailerInventory[] = [
 ]
 
 export const INITIAL_LISTINGS: SupplierListing[] = [
-  // Wholesaler listings
+  // Wholesaler listings (Close in Industrial Area / Westlands, slightly higher base rate, fast Boda delivery)
   {
     id: 'list-1',
     supplier_id: 'user-wholesaler-1',
@@ -224,12 +224,69 @@ export const INITIAL_LISTINGS: SupplierListing[] = [
     distance_km: 3.2,
     total_delivery_fee: 160,
   },
-  // Farmer listings
+  {
+    id: 'list-wh-4',
+    supplier_id: 'user-wholesaler-1',
+    product_id: 'prod-4', // Tomatoes
+    price_per_unit: 80,
+    available_stock: 250,
+    min_order_quantity: 5,
+    unit: 'kg',
+    is_active: true,
+    location: { type: 'Point', coordinates: [36.845, -1.305] },
+    delivery_radius_km: 25,
+    delivery_fee_per_km: 50,
+    created_at: '2026-09-01T00:00:00Z',
+    updated_at: '2026-09-21T10:00:00Z',
+    product: SEED_PRODUCTS[3],
+    supplier: DEMO_PROFILES.wholesaler,
+    distance_km: 3.2,
+    total_delivery_fee: 160,
+  },
+  {
+    id: 'list-wh-6',
+    supplier_id: 'user-wholesaler-1',
+    product_id: 'prod-6', // Irish Potatoes
+    price_per_unit: 58,
+    available_stock: 900,
+    min_order_quantity: 15,
+    unit: 'kg',
+    is_active: true,
+    location: { type: 'Point', coordinates: [36.845, -1.305] },
+    delivery_radius_km: 25,
+    delivery_fee_per_km: 50,
+    created_at: '2026-09-01T00:00:00Z',
+    updated_at: '2026-09-21T10:00:00Z',
+    product: SEED_PRODUCTS[5],
+    supplier: DEMO_PROFILES.wholesaler,
+    distance_km: 3.2,
+    total_delivery_fee: 160,
+  },
+  {
+    id: 'list-wh-8',
+    supplier_id: 'user-wholesaler-1',
+    product_id: 'prod-8', // Eggs
+    price_per_unit: 390,
+    available_stock: 120,
+    min_order_quantity: 2,
+    unit: 'trays',
+    is_active: true,
+    location: { type: 'Point', coordinates: [36.845, -1.305] },
+    delivery_radius_km: 25,
+    delivery_fee_per_km: 50,
+    created_at: '2026-09-01T00:00:00Z',
+    updated_at: '2026-09-21T10:00:00Z',
+    product: SEED_PRODUCTS[7],
+    supplier: DEMO_PROFILES.wholesaler,
+    distance_km: 3.2,
+    total_delivery_fee: 160,
+  },
+  // Farmer listings (Further in Limuru / Kiambu, cheaper farm gate rate, longer Boda transit)
   {
     id: 'list-4',
     supplier_id: 'user-farmer-1',
-    product_id: 'prod-1',
-    price_per_unit: 40, // Cheaper direct from farm!
+    product_id: 'prod-1', // Maize
+    price_per_unit: 40,
     available_stock: 1500,
     min_order_quantity: 25,
     unit: 'kg',
@@ -245,9 +302,28 @@ export const INITIAL_LISTINGS: SupplierListing[] = [
     total_delivery_fee: 306,
   },
   {
+    id: 'list-fm-2',
+    supplier_id: 'user-farmer-1',
+    product_id: 'prod-2', // Beans
+    price_per_unit: 110,
+    available_stock: 800,
+    min_order_quantity: 10,
+    unit: 'kg',
+    is_active: true,
+    location: { type: 'Point', coordinates: [36.721, -1.218] },
+    delivery_radius_km: 40,
+    delivery_fee_per_km: 45,
+    created_at: '2026-09-01T00:00:00Z',
+    updated_at: '2026-09-21T10:00:00Z',
+    product: SEED_PRODUCTS[1],
+    supplier: DEMO_PROFILES.farmer,
+    distance_km: 6.8,
+    total_delivery_fee: 306,
+  },
+  {
     id: 'list-5',
     supplier_id: 'user-farmer-1',
-    product_id: 'prod-4',
+    product_id: 'prod-4', // Tomatoes
     price_per_unit: 65,
     available_stock: 320,
     min_order_quantity: 5,
@@ -264,9 +340,28 @@ export const INITIAL_LISTINGS: SupplierListing[] = [
     total_delivery_fee: 306,
   },
   {
+    id: 'list-fm-6',
+    supplier_id: 'user-farmer-1',
+    product_id: 'prod-6', // Irish Potatoes
+    price_per_unit: 42,
+    available_stock: 1200,
+    min_order_quantity: 20,
+    unit: 'kg',
+    is_active: true,
+    location: { type: 'Point', coordinates: [36.721, -1.218] },
+    delivery_radius_km: 40,
+    delivery_fee_per_km: 45,
+    created_at: '2026-09-01T00:00:00Z',
+    updated_at: '2026-09-21T10:00:00Z',
+    product: SEED_PRODUCTS[5],
+    supplier: DEMO_PROFILES.farmer,
+    distance_km: 6.8,
+    total_delivery_fee: 306,
+  },
+  {
     id: 'list-6',
     supplier_id: 'user-farmer-1',
-    product_id: 'prod-8',
+    product_id: 'prod-8', // Eggs
     price_per_unit: 360,
     available_stock: 80,
     min_order_quantity: 2,

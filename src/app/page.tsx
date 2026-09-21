@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import {
   Store,
@@ -17,7 +18,104 @@ import {
   Check,
 } from 'lucide-react'
 
+const COMMODITY_RADAR_DATA = [
+  {
+    name: 'Dry White Maize',
+    category: 'Grains',
+    unit: 'kg',
+    batch: '50 kg',
+    cheapest: {
+      supplier: 'Green Valley Farm Gate',
+      unitPrice: 40,
+      distance: '6.8 km',
+      eta: '~20 min',
+      total: 2306,
+      savings: 104,
+    },
+    fastest: {
+      supplier: 'Kilimo Traders Wholesale',
+      unitPrice: 45,
+      distance: '3.2 km',
+      eta: '~12 min',
+      total: 2410,
+      timeSaved: '8 min',
+    },
+    guidance: 'Save KSh 104 via Farm Gate, or pay KSh 104 more to receive shipment 8 min earlier via local wholesale depot.',
+  },
+  {
+    name: 'Plum Salad Tomatoes',
+    category: 'Vegetables',
+    unit: 'kg',
+    batch: '30 kg',
+    cheapest: {
+      supplier: 'Green Valley Farm Gate',
+      unitPrice: 65,
+      distance: '6.8 km',
+      eta: '~20 min',
+      total: 2256,
+      savings: 304,
+    },
+    fastest: {
+      supplier: 'Kilimo Traders Wholesale',
+      unitPrice: 80,
+      distance: '3.2 km',
+      eta: '~12 min',
+      total: 2560,
+      timeSaved: '8 min',
+    },
+    guidance: 'Substantial KSh 304 margin improvement direct from farm. Kilimo Traders is best for urgent lunch rush replenishment.',
+  },
+  {
+    name: 'Rosecoco Clean Beans',
+    category: 'Grains',
+    unit: 'kg',
+    batch: '40 kg',
+    cheapest: {
+      supplier: 'Green Valley Farm Gate',
+      unitPrice: 110,
+      distance: '6.8 km',
+      eta: '~20 min',
+      total: 4706,
+      savings: 454,
+    },
+    fastest: {
+      supplier: 'Kilimo Traders Wholesale',
+      unitPrice: 125,
+      distance: '3.2 km',
+      eta: '~12 min',
+      total: 5160,
+      timeSaved: '8 min',
+    },
+    guidance: 'Direct Limuru harvest delivers KSh 454 net savings on 40kg sacks with reliable courier dispatch.',
+  },
+  {
+    name: 'Shangi Irish Potatoes',
+    category: 'Vegetables',
+    unit: 'kg',
+    batch: '50 kg',
+    cheapest: {
+      supplier: 'Green Valley Farm Gate',
+      unitPrice: 42,
+      distance: '6.8 km',
+      eta: '~20 min',
+      total: 2406,
+      savings: 654,
+    },
+    fastest: {
+      supplier: 'Kilimo Traders Wholesale',
+      unitPrice: 58,
+      distance: '3.2 km',
+      eta: '~12 min',
+      total: 3060,
+      timeSaved: '8 min',
+    },
+    guidance: 'Heavy commodity: farm gate saves a massive KSh 654 per 50kg bag even after long-range Boda carrier fees.',
+  },
+]
+
 export default function HomePage() {
+  const [filterMode, setFilterMode] = useState<'all' | 'cheapest' | 'fastest'>('all')
+
   return (
     <div className="min-h-screen bg-[#0a0a0c] text-[#e2e4e9] tactical-grid font-mono selection:bg-blue-600 selection:text-white">
       {/* Top Telemetry Ticker */}
@@ -216,6 +314,161 @@ export default function HomePage() {
                 <span className="group-hover:translate-x-1 transition-transform">»</span>
               </div>
             </Link>
+          </div>
+        </section>
+
+        {/* Live Consumer Commodity Routing Matrix: Price vs Speed */}
+        <section className="p-6 bg-[#0c0d10] border-2 border-blue-600/70 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#20222a] pb-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 bg-blue-500 animate-pulse" />
+                <h2 className="text-sm font-black text-white uppercase tracking-wider">
+                  CONSUMER SOURCING RADAR // CHEAPEST VS FASTEST ROUTING
+                </h2>
+              </div>
+              <p className="text-[11px] text-[#9497a1] mt-0.5">
+                Real-time price arbitration: compare direct farm-gate savings vs local wholesale depot arrival speed
+              </p>
+            </div>
+
+            {/* Interactive Mode Filter */}
+            <div className="flex items-center gap-1.5 text-xs">
+              <button
+                onClick={() => setFilterMode('all')}
+                className={`px-3 py-1.5 font-bold border transition-colors ${
+                  filterMode === 'all'
+                    ? 'bg-blue-600 text-white border-blue-500'
+                    : 'bg-[#121318] text-[#9497a1] border-[#22242c] hover:text-white'
+                }`}
+              >
+                SHOW ALL
+              </button>
+              <button
+                onClick={() => setFilterMode('cheapest')}
+                className={`px-3 py-1.5 font-bold border transition-colors ${
+                  filterMode === 'cheapest'
+                    ? 'bg-blue-600 text-white border-blue-500'
+                    : 'bg-[#121318] text-[#9497a1] border-[#22242c] hover:text-white'
+                }`}
+              >
+                ★ HIGHLIGHT CHEAPEST
+              </button>
+              <button
+                onClick={() => setFilterMode('fastest')}
+                className={`px-3 py-1.5 font-bold border transition-colors ${
+                  filterMode === 'fastest'
+                    ? 'bg-white text-black border-white'
+                    : 'bg-[#121318] text-[#9497a1] border-[#22242c] hover:text-white'
+                }`}
+              >
+                ⚡ HIGHLIGHT FASTEST
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {COMMODITY_RADAR_DATA.map((item) => {
+              const showCheapestHighlight = filterMode === 'all' || filterMode === 'cheapest'
+              const showFastestHighlight = filterMode === 'all' || filterMode === 'fastest'
+
+              return (
+                <div
+                  key={item.name}
+                  className="p-4 bg-[#101116] border border-[#22242e] space-y-4 hover:border-blue-500 transition-colors"
+                >
+                  <div className="flex items-start justify-between border-b border-[#1c1e28] pb-2">
+                    <div>
+                      <span className="text-[10px] text-blue-400 font-bold uppercase block tracking-wider">
+                        {item.category} // REQUISITION BATCH: {item.batch}
+                      </span>
+                      <h3 className="text-lg font-black text-white uppercase">{item.name}</h3>
+                    </div>
+                    <Link
+                      href="/dashboard/retailer"
+                      className="px-2.5 py-1 bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-black uppercase tracking-wider transition-colors inline-flex items-center gap-1"
+                    >
+                      <span>ORDER »</span>
+                    </Link>
+                  </div>
+
+                  {/* Dual Comparison Cards */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                    {/* Cheapest Pick */}
+                    <div
+                      className={`p-3 bg-[#08090d] border transition-all space-y-1.5 ${
+                        showCheapestHighlight
+                          ? 'border-blue-600 bg-blue-950/20'
+                          : 'border-[#1e202a] opacity-70'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-black px-1.5 py-0.5 bg-blue-600 text-white uppercase">
+                          ★ CHEAPEST
+                        </span>
+                        <span className="text-[10px] text-blue-300 font-bold">
+                          SAVE KSh {item.cheapest.savings}
+                        </span>
+                      </div>
+                      <h4 className="font-bold text-white text-sm">{item.cheapest.supplier}</h4>
+                      <div className="text-[11px] text-[#9497a1] space-y-0.5">
+                        <div className="flex justify-between">
+                          <span>RATE:</span>
+                          <strong className="text-white">KSh {item.cheapest.unitPrice}/{item.unit}</strong>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>TRANSIT:</span>
+                          <span>{item.cheapest.eta} ({item.cheapest.distance})</span>
+                        </div>
+                        <div className="flex justify-between pt-1 border-t border-[#181a24] text-white font-bold">
+                          <span>ALL-IN TOTAL:</span>
+                          <span className="text-blue-400 font-black">KSh {item.cheapest.total.toLocaleString()}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Fastest Pick */}
+                    <div
+                      className={`p-3 bg-[#08090d] border transition-all space-y-1.5 ${
+                        showFastestHighlight
+                          ? 'border-white bg-[#14151c]'
+                          : 'border-[#1e202a] opacity-70'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-black px-1.5 py-0.5 bg-white text-black uppercase">
+                          ⚡ FASTEST
+                        </span>
+                        <span className="text-[10px] text-white font-bold">
+                          {item.fastest.timeSaved} FASTER
+                        </span>
+                      </div>
+                      <h4 className="font-bold text-white text-sm">{item.fastest.supplier}</h4>
+                      <div className="text-[11px] text-[#9497a1] space-y-0.5">
+                        <div className="flex justify-between">
+                          <span>RATE:</span>
+                          <strong className="text-white">KSh {item.fastest.unitPrice}/{item.unit}</strong>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>TRANSIT:</span>
+                          <span className="text-white font-bold">{item.fastest.eta} ({item.fastest.distance})</span>
+                        </div>
+                        <div className="flex justify-between pt-1 border-t border-[#181a24] text-white font-bold">
+                          <span>ALL-IN TOTAL:</span>
+                          <span className="text-white font-black">KSh {item.fastest.total.toLocaleString()}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Decision Guidance Footer */}
+                  <div className="p-2 bg-[#090a0d] border border-[#1a1c24] text-[10px] text-[#9497a1]">
+                    <strong className="text-white">TACTICAL VERDICT: </strong>
+                    {item.guidance}
+                  </div>
+                </div>
+              )
+            })}
           </div>
         </section>
 

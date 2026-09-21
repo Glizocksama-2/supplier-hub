@@ -32,24 +32,84 @@ export default function RetailerDashboard() {
   const [orderQuantity, setOrderQuantity] = useState<number>(50)
   const [deliveryNotes, setDeliveryNotes] = useState<string>('Counter drop-off at kiosk')
   const [orderSuccessMessage, setOrderSuccessMessage] = useState<string | null>(null)
+  const [sortPreference, setSortPreference] = useState<'cheapest' | 'fastest' | 'unit_price'>('cheapest')
 
   const lowStockItems = inventory.filter((i) => i.current_stock <= i.low_stock_threshold)
   const healthyStockItems = inventory.filter((i) => i.current_stock > i.low_stock_threshold)
 
-  const relevantListings: SupplierListing[] = selectedRestockItem
+  // Calculate ETA for carrier dispatch based on distance
+  const getETA = (distanceKm: number = 3) => {
+    const mins = Math.max(5, Math.round(5 + distanceKm * 2.2))
+    return { mins, label: `~${mins} MIN` }
+  }
+
+  // Cross-supplier sourcing intelligence for any SKU
+  const getProductSourcingIntel = (productId: string, quantity: number = 50) => {
+    const active = listings.filter((l) => l.product_id === productId && l.is_active)
+    if (active.length === 0) return null
+
+    const withMetrics = active.map((l) => {
+      const itemTotal = l.price_per_unit * quantity
+      const deliveryFee = l.total_delivery_fee || Math.round((l.distance_km || 3) * 50)
+      const grandTotal = itemTotal + deliveryFee
+      const eta = getETA(l.distance_km || 3)
+      return { listing: l, itemTotal, deliveryFee, grandTotal, etaMins: eta.mins, etaLabel: eta.label }
+    })
+
+    withMetrics.sort((a, b) => a.grandTotal - b.grandTotal)
+    const cheapest = withMetrics[0]
+
+    const withMetricsBySpeed = [...withMetrics].sort((a, b) => a.etaMins - b.etaMins)
+    const fastest = withMetricsBySpeed[0]
+
+    const maxCost = withMetrics[withMetrics.length - 1].grandTotal
+    const maxETA = withMetricsBySpeed[withMetricsBySpeed.length - 1].etaMins
+
+    return {
+      cheapest,
+      fastest,
+      isSame: cheapest.listing.id === fastest.listing.id,
+      savings: Math.max(0, maxCost - cheapest.grandTotal),
+      timeSavedMins: Math.max(0, maxETA - fastest.etaMins),
+    }
+  }
+
+  // Analyzed listings for currently active restock modal
+  const analyzedListings = selectedRestockItem
     ? listings
         .filter((l) => l.product_id === selectedRestockItem.product_id && l.is_active)
-        .sort((a, b) => {
-          const costA = a.price_per_unit * orderQuantity + (a.total_delivery_fee || 0)
-          const costB = b.price_per_unit * orderQuantity + (b.total_delivery_fee || 0)
-          return costA - costB
+        .map((l) => {
+          const itemTotal = l.price_per_unit * orderQuantity
+          const deliveryFee = l.total_delivery_fee || Math.round((l.distance_km || 3) * 50)
+          const grandTotal = itemTotal + deliveryFee
+          const eta = getETA(l.distance_km || 3)
+          return {
+            ...l,
+            itemTotal,
+            deliveryFee,
+            grandTotal,
+            etaMins: eta.mins,
+            etaLabel: eta.label,
+          }
         })
     : []
+
+  const minCost = analyzedListings.length > 0 ? Math.min(...analyzedListings.map((l) => l.grandTotal)) : 0
+  const maxCost = analyzedListings.length > 0 ? Math.max(...analyzedListings.map((l) => l.grandTotal)) : 0
+  const minETA = analyzedListings.length > 0 ? Math.min(...analyzedListings.map((l) => l.etaMins)) : 0
+  const maxETA = analyzedListings.length > 0 ? Math.max(...analyzedListings.map((l) => l.etaMins)) : 0
+
+  const sortedListings = [...analyzedListings].sort((a, b) => {
+    if (sortPreference === 'cheapest') return a.grandTotal - b.grandTotal
+    if (sortPreference === 'fastest') return a.etaMins - b.etaMins
+    return a.price_per_unit - b.price_per_unit
+  })
 
   const handleOpenRestock = (item: RetailerInventory) => {
     setSelectedRestockItem(item)
     setOrderQuantity(item.reorder_quantity || 50)
     setOrderSuccessMessage(null)
+    setSortPreference('cheapest')
   }
 
   const handlePlaceOrder = (listing: SupplierListing) => {
@@ -124,51 +184,95 @@ export default function RetailerDashboard() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-              {lowStockItems.map((item) => (
-                <div
-                  key={item.id}
-                  className="bg-[#0e0f13] border-2 border-blue-600 p-4 flex flex-col justify-between"
-                >
-                  <div>
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <span className="text-[10px] font-black text-blue-400 uppercase tracking-wider block">
-                          [CRITICAL SHORTAGE]
-                        </span>
-                        <h3 className="text-lg font-black text-white uppercase mt-0.5">
-                          {item.product?.name}
-                        </h3>
-                        <span className="text-[10px] text-[#9497a1]">CATEGORY: {item.product?.category}</span>
-                      </div>
-                      <div className="text-right">
-                        <span className="text-3xl font-black text-white">
-                          {item.current_stock}
-                        </span>
-                        <span className="text-[10px] text-[#616572] block uppercase">
-                          / MIN {item.low_stock_threshold} {item.product?.unit}
-                        </span>
-                      </div>
-                    </div>
+              {lowStockItems.map((item) => {
+                const intel = getProductSourcingIntel(item.product_id, item.reorder_quantity || 50)
 
-                    <div className="w-full bg-[#161820] h-2.5 mt-3 border border-[#242630]">
-                      <div
-                        className="bg-blue-600 h-full"
-                        style={{
-                          width: `${Math.min(100, (item.current_stock / item.low_stock_threshold) * 100)}%`,
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() => handleOpenRestock(item)}
-                    className="mt-4 w-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-black py-2.5 px-3 uppercase tracking-wider flex items-center justify-center gap-2 transition-colors"
+                return (
+                  <div
+                    key={item.id}
+                    className="bg-[#0e0f13] border-2 border-blue-600 p-4 flex flex-col justify-between space-y-4"
                   >
-                    <span>[COMPARE WHOLESALE & FARM GATE]</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              ))}
+                    <div>
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <span className="text-[10px] font-black text-blue-400 uppercase tracking-wider block">
+                            [CRITICAL SHORTAGE]
+                          </span>
+                          <h3 className="text-lg font-black text-white uppercase mt-0.5">
+                            {item.product?.name}
+                          </h3>
+                          <span className="text-[10px] text-[#9497a1]">CATEGORY: {item.product?.category}</span>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-3xl font-black text-white">
+                            {item.current_stock}
+                          </span>
+                          <span className="text-[10px] text-[#616572] block uppercase">
+                            / MIN {item.low_stock_threshold} {item.product?.unit}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="w-full bg-[#161820] h-2 mt-3 border border-[#242630]">
+                        <div
+                          className="bg-blue-600 h-full"
+                          style={{
+                            width: `${Math.min(100, (item.current_stock / item.low_stock_threshold) * 100)}%`,
+                          }}
+                        />
+                      </div>
+
+                      {/* Live Decision Radar: Cheaper vs Faster */}
+                      {intel && (
+                        <div className="mt-4 p-3 bg-[#08090d] border border-[#22242e] space-y-2 text-[11px]">
+                          <div className="flex items-center justify-between text-[10px] font-black tracking-wider text-[#9497a1] uppercase border-b border-[#181a22] pb-1.5">
+                            <span className="text-blue-400">SMART SOURCING RADAR</span>
+                            <span>{item.reorder_quantity || 50} {item.product?.unit} BATCH</span>
+                          </div>
+
+                          {/* Cheapest Option */}
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="inline-flex items-center gap-1.5 font-black text-white">
+                              <span className="w-2 h-2 bg-blue-500" />
+                              ★ CHEAPEST:
+                            </span>
+                            <div className="text-right">
+                              <span className="text-white font-bold">{intel.cheapest.listing.supplier?.business_name}</span>
+                              <span className="text-blue-400 font-bold block text-[10px]">
+                                KSh {intel.cheapest.listing.price_per_unit}/{item.product?.unit} • Total KSh {intel.cheapest.grandTotal.toLocaleString()}
+                                {intel.savings > 0 && ` (Save KSh ${intel.savings})`}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Fastest Option */}
+                          <div className="flex items-center justify-between gap-2 pt-1 border-t border-[#14151c]">
+                            <span className="inline-flex items-center gap-1.5 font-black text-white">
+                              <span className="w-2 h-2 bg-white" />
+                              ⚡ FASTEST:
+                            </span>
+                            <div className="text-right">
+                              <span className="text-white font-bold">{intel.fastest.listing.supplier?.business_name}</span>
+                              <span className="text-[#9497a1] font-bold block text-[10px]">
+                                ETA {intel.fastest.etaLabel} ({intel.fastest.listing.distance_km}km) • Total KSh {intel.fastest.grandTotal.toLocaleString()}
+                                {intel.timeSavedMins > 0 && ` (${intel.timeSavedMins}m faster)`}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <button
+                      onClick={() => handleOpenRestock(item)}
+                      className="w-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-black py-2.5 px-3 uppercase tracking-wider flex items-center justify-center gap-2 transition-colors"
+                    >
+                      <span>[REQUISITION // COMPARE CHEAPEST & FASTEST]</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                )
+              })}
             </div>
           </section>
         )}
@@ -198,12 +302,15 @@ export default function RetailerDashboard() {
                   <th className="pb-2 font-bold">CURRENT STOCK</th>
                   <th className="pb-2 font-bold">MIN THRESHOLD</th>
                   <th className="pb-2 font-bold">STATUS</th>
+                  <th className="pb-2 font-bold">SMART SOURCING (CHEAPEST VS FASTEST)</th>
                   <th className="pb-2 font-bold text-right">ACTION</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#181a22]">
                 {inventory.map((inv) => {
                   const isLow = inv.current_stock <= inv.low_stock_threshold
+                  const intel = getProductSourcingIntel(inv.product_id, inv.reorder_quantity || 50)
+
                   return (
                     <tr key={inv.id} className="hover:bg-[#12141c] transition-colors">
                       <td className="py-3 font-bold text-white uppercase">
@@ -245,6 +352,26 @@ export default function RetailerDashboard() {
                           <span className="text-[10px] font-bold text-[#9497a1] bg-[#14151a] border border-[#242632] px-2 py-0.5 uppercase">
                             NOMINAL
                           </span>
+                        )}
+                      </td>
+                      <td className="py-3 text-[11px]">
+                        {intel ? (
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                            <span className="inline-flex items-center gap-1 bg-[#101217] border border-[#20222a] px-2 py-0.5 text-[10px]">
+                              <span className="w-1.5 h-1.5 bg-blue-500" />
+                              <strong className="text-white font-bold">★ CHEAPEST:</strong>
+                              <span className="text-blue-400 font-bold">{intel.cheapest.listing.supplier?.business_name}</span>
+                              <span className="text-[#9497a1]">(KSh {intel.cheapest.listing.price_per_unit}/{inv.product?.unit})</span>
+                            </span>
+                            <span className="inline-flex items-center gap-1 bg-[#101217] border border-[#20222a] px-2 py-0.5 text-[10px]">
+                              <span className="w-1.5 h-1.5 bg-white" />
+                              <strong className="text-white font-bold">⚡ FASTEST:</strong>
+                              <span className="text-white font-bold">{intel.fastest.listing.supplier?.business_name}</span>
+                              <span className="text-blue-300 font-bold">({intel.fastest.etaLabel})</span>
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="text-[#616572] text-[10px]">LOCAL SOURCING ONLY</span>
                         )}
                       </td>
                       <td className="py-3 text-right">
@@ -385,56 +512,211 @@ export default function RetailerDashboard() {
               </div>
             )}
 
-            {/* Comparison Grid */}
-            <div className="space-y-3">
-              <span className="text-[10px] text-[#616572] font-black uppercase tracking-wider block">
-                AVAILABLE VERIFIED SOURCES ({relevantListings.length} DEPOTS / FARMS INDEXED):
+            {/* Dual Decision Radar: Cheapest vs Fastest Summary */}
+            {analyzedListings.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+                {/* Cheapest Spotlight */}
+                {(() => {
+                  const cheapestListing = [...analyzedListings].sort((a, b) => a.grandTotal - b.grandTotal)[0]
+                  const savings = maxCost - minCost
+                  return (
+                    <div className="p-3 bg-[#0d0e12] border-2 border-blue-600 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-blue-600 text-white font-black text-[10px] uppercase tracking-wider">
+                          ★ CHEAPEST OPTION
+                        </span>
+                        {savings > 0 && (
+                          <span className="text-[10px] text-blue-300 font-bold bg-blue-950 px-1.5 py-0.5 border border-blue-800">
+                            SAVE KSh {savings.toLocaleString()}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-end justify-between">
+                        <div>
+                          <h4 className="font-black text-white text-sm uppercase">
+                            {cheapestListing.supplier?.business_name}
+                          </h4>
+                          <span className="text-[11px] text-[#9497a1] block">
+                            KSh {cheapestListing.price_per_unit}/{cheapestListing.unit} • ETA {cheapestListing.etaLabel} ({cheapestListing.distance_km} km)
+                          </span>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-lg font-black text-white block">
+                            KSh {cheapestListing.grandTotal.toLocaleString()}
+                          </span>
+                          <span className="text-[9px] text-[#616572]">ALL-IN INVOICE</span>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => handlePlaceOrder(cheapestListing)}
+                        className="w-full py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-black text-[11px] uppercase tracking-wider transition-colors"
+                      >
+                        [ORDER CHEAPEST NOW »]
+                      </button>
+                    </div>
+                  )
+                })()}
+
+                {/* Fastest Spotlight */}
+                {(() => {
+                  const fastestListing = [...analyzedListings].sort((a, b) => a.etaMins - b.etaMins)[0]
+                  const timeSaved = maxETA - minETA
+                  return (
+                    <div className="p-3 bg-[#0d0e12] border-2 border-white space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-white text-black font-black text-[10px] uppercase tracking-wider">
+                          ⚡ FASTEST ARRIVAL
+                        </span>
+                        {timeSaved > 0 && (
+                          <span className="text-[10px] text-white font-bold bg-[#1e2028] px-1.5 py-0.5 border border-[#383b48]">
+                            {timeSaved} MIN FASTER
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-end justify-between">
+                        <div>
+                          <h4 className="font-black text-white text-sm uppercase">
+                            {fastestListing.supplier?.business_name}
+                          </h4>
+                          <span className="text-[11px] text-[#9497a1] block">
+                            ETA {fastestListing.etaLabel} ({fastestListing.distance_km} km) • KSh {fastestListing.price_per_unit}/{fastestListing.unit}
+                          </span>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-lg font-black text-white block">
+                            KSh {fastestListing.grandTotal.toLocaleString()}
+                          </span>
+                          <span className="text-[9px] text-[#616572]">ALL-IN INVOICE</span>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => handlePlaceOrder(fastestListing)}
+                        className="w-full py-1.5 bg-[#1a1c24] hover:bg-[#252834] text-white border border-[#383b48] hover:border-white font-black text-[11px] uppercase tracking-wider transition-colors"
+                      >
+                        [ORDER FASTEST NOW »]
+                      </button>
+                    </div>
+                  )
+                })()}
+              </div>
+            )}
+
+            {/* Sorting & Filter Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2 border-t border-[#1c1e26]">
+              <span className="text-[10px] text-[#616572] font-black uppercase tracking-wider">
+                ALL INDEXED DEPOTS & FARMS ({sortedListings.length}):
               </span>
 
-              {relevantListings.map((list) => {
-                const itemTotal = list.price_per_unit * orderQuantity
-                const deliveryFee = list.total_delivery_fee || Math.round(list.distance_km! * 50)
-                const grandTotal = itemTotal + deliveryFee
+              <div className="flex items-center gap-1.5 text-[10px]">
+                <span className="text-[#9497a1]">SORT:</span>
+                <button
+                  onClick={() => setSortPreference('cheapest')}
+                  className={`px-2.5 py-1 font-bold border transition-colors ${
+                    sortPreference === 'cheapest'
+                      ? 'bg-blue-600 text-white border-blue-500'
+                      : 'bg-[#121318] text-[#9497a1] border-[#22242e] hover:text-white'
+                  }`}
+                >
+                  ★ CHEAPEST FIRST
+                </button>
+                <button
+                  onClick={() => setSortPreference('fastest')}
+                  className={`px-2.5 py-1 font-bold border transition-colors ${
+                    sortPreference === 'fastest'
+                      ? 'bg-blue-600 text-white border-blue-500'
+                      : 'bg-[#121318] text-[#9497a1] border-[#22242e] hover:text-white'
+                  }`}
+                >
+                  ⚡ FASTEST FIRST
+                </button>
+                <button
+                  onClick={() => setSortPreference('unit_price')}
+                  className={`px-2.5 py-1 font-bold border transition-colors ${
+                    sortPreference === 'unit_price'
+                      ? 'bg-blue-600 text-white border-blue-500'
+                      : 'bg-[#121318] text-[#9497a1] border-[#22242e] hover:text-white'
+                  }`}
+                >
+                  UNIT RATE
+                </button>
+              </div>
+            </div>
+
+            {/* Detailed Listings Comparison */}
+            <div className="space-y-3">
+              {sortedListings.map((list) => {
+                const isCheapest = list.grandTotal === minCost && minCost > 0
+                const isFastest = list.etaMins === minETA && minETA > 0
                 const isFarmer = list.supplier?.role === 'farmer'
 
                 return (
                   <div
                     key={list.id}
-                    className="p-4 bg-[#101116] border border-[#22242c] hover:border-blue-500 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                    className={`p-4 bg-[#101116] border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
+                      isCheapest
+                        ? 'border-blue-600 shadow-md shadow-blue-600/10'
+                        : isFastest
+                        ? 'border-white'
+                        : 'border-[#22242c] hover:border-[#383b48]'
+                    }`}
                   >
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
+                    <div className="space-y-2">
+                      <div className="flex flex-wrap items-center gap-2">
+                        {isCheapest && isFastest ? (
+                          <span className="text-[10px] font-black px-2 py-0.5 uppercase bg-blue-600 text-white border border-white">
+                            ★ OPTIMAL // CHEAPEST & FASTEST
+                          </span>
+                        ) : isCheapest ? (
+                          <span className="text-[10px] font-black px-2 py-0.5 uppercase bg-blue-600 text-white border border-blue-400">
+                            ★ CHEAPEST INVOICE {maxCost > minCost && `// SAVE KSH ${(maxCost - minCost).toLocaleString()}`}
+                          </span>
+                        ) : isFastest ? (
+                          <span className="text-[10px] font-black px-2 py-0.5 uppercase bg-white text-black border border-white">
+                            ⚡ FASTEST ARRIVAL // ETA {list.etaLabel}
+                          </span>
+                        ) : null}
+
                         <span className="text-[9px] font-black px-1.5 py-0.5 uppercase bg-blue-950 text-blue-300 border border-blue-800">
                           {isFarmer ? 'DIRECT FARM GATE' : 'WHOLESALE DEPOT'}
                         </span>
-                        <h4 className="font-black text-white text-sm uppercase">
+                        <h4 className="font-black text-white text-base uppercase">
                           {list.supplier?.business_name}
                         </h4>
                       </div>
 
-                      <div className="text-[11px] text-[#9497a1] flex flex-wrap gap-3">
-                        <span>DISTANCE: {list.distance_km} KM ({list.supplier?.address})</span>
+                      <div className="text-[11px] text-[#9497a1] flex flex-wrap gap-4">
+                        <span className="text-white font-bold">
+                          TRANSIT: <strong className="text-blue-400">{list.etaLabel}</strong> ({list.distance_km} KM via Boda)
+                        </span>
                         <span>STOCK: {list.available_stock} {list.unit}</span>
-                        <span className="text-blue-400">RATE: KSH {list.price_per_unit}/{list.unit}</span>
+                        <span>RATE: <strong className="text-white">KSh {list.price_per_unit}/{list.unit}</strong></span>
+                      </div>
+
+                      <div className="text-[10px] text-[#616572]">
+                        COST BREAKDOWN: Commodity (KSh {list.itemTotal.toLocaleString()}) + Boda Carrier (KSh {list.deliveryFee})
                       </div>
                     </div>
 
                     <div className="flex items-center gap-4 sm:border-l sm:border-[#20222a] sm:pl-4">
-                      <div className="text-right">
+                      <div className="text-right min-w-[120px]">
                         <span className="text-[10px] text-[#616572] uppercase block">TOTAL INVOICE</span>
-                        <span className="text-xl font-black text-white">
-                          KSh {grandTotal.toLocaleString()}
+                        <span className="text-2xl font-black text-white block">
+                          KSh {list.grandTotal.toLocaleString()}
                         </span>
-                        <span className="text-[9px] text-[#616572] block">
-                          INC. KSH {deliveryFee} BODA CARRIER
+                        <span className="text-[9px] text-[#9497a1] block">
+                          ETA {list.etaLabel}
                         </span>
                       </div>
 
                       <button
                         onClick={() => handlePlaceOrder(list)}
-                        className="px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-black text-xs uppercase tracking-wider transition-colors"
+                        className={`px-4 py-2.5 font-black text-xs uppercase tracking-wider transition-colors min-w-[130px] ${
+                          isCheapest
+                            ? 'bg-blue-600 hover:bg-blue-500 text-white'
+                            : 'bg-white hover:bg-zinc-200 text-black'
+                        }`}
                       >
-                        CONFIRM & REQUISITION »
+                        REQUISITION »
                       </button>
                     </div>
                   </div>

@@ -182,6 +182,33 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
         }
       }
 
+      // 4. Comparison query: "who is cheaper", "which is faster", "compare maize", "who is cheaper and faster"
+      if (text.includes('cheap') || text.includes('fast') || text.includes('compare') || text.includes('sourcing')) {
+        const matchedProd = products.find((p) =>
+          text.includes(p.name.toLowerCase()) || text.includes(p.name.toLowerCase().split(' ')[0])
+        ) || products[0]
+
+        const avail = listings.filter((l) => l.product_id === matchedProd.id && l.is_active)
+        if (avail.length >= 2) {
+          const qty = 50
+          const withTotals = avail.map((l) => ({
+            ...l,
+            total: l.price_per_unit * qty + (l.total_delivery_fee || Math.round((l.distance_km || 3) * 50)),
+            etaMins: Math.max(5, Math.round(5 + (l.distance_km || 3) * 2.2)),
+          }))
+
+          const cheapest = [...withTotals].sort((a, b) => a.total - b.total)[0]
+          const fastest = [...withTotals].sort((a, b) => a.etaMins - b.etaMins)[0]
+          const savings = Math.max(...withTotals.map(w => w.total)) - cheapest.total
+          const timeSaved = Math.max(...withTotals.map(w => w.etaMins)) - fastest.etaMins
+
+          const reply = `Analysis for ${matchedProd.name}: ${cheapest.supplier?.business_name} is the cheapest at KSh ${cheapest.price_per_unit} per ${matchedProd.unit}, saving KSh ${savings.toLocaleString()} on a 50kg batch. ${fastest.supplier?.business_name} is the fastest, arriving in approximately ${fastest.etaMins} minutes via Boda, saving ${timeSaved} minutes.`
+          setResponseMessage(reply)
+          speakText(reply)
+          return
+        }
+      }
+
       // 4. Role switch
       if (text.includes('boda')) {
         switchRole('boda_rider')
@@ -535,10 +562,10 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
               [MACRO 3] » "Who sells beans"
             </button>
             <button
-              onClick={() => triggerSample('Switch to boda rider')}
-              className="p-2 bg-[#121318] hover:bg-[#181a22] border border-[#22242c] hover:border-blue-500 text-left text-white transition-colors"
+              onClick={() => triggerSample('Who is cheaper and faster for maize?')}
+              className="p-2 bg-[#0c1322] hover:bg-[#121c32] border border-blue-600 hover:border-blue-400 text-left text-white transition-colors col-span-2"
             >
-              [MACRO 4] » "Switch to Boda Dispatch"
+              [★ SMART RADAR] » "Who is cheaper and faster for maize?"
             </button>
           </div>
         </div>
