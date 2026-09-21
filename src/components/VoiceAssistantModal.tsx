@@ -26,6 +26,8 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
 
   const recognitionRef = useRef<any>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
+  const silenceTimerRef = useRef<any>(null)
+  const transcriptRef = useRef<string>('')
 
   const speakWithBrowserSpeech = useCallback((text: string) => {
     if (typeof window === 'undefined') return
@@ -218,22 +220,81 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
     [products, listings, inventory, createOrder, switchRole, speakText]
   )
 
-  const startListening = () => {
+  const stopListening = useCallback(() => {
+    if (silenceTimerRef.current) {
+      clearTimeout(silenceTimerRef.current)
+      silenceTimerRef.current = null
+    }
+
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop()
+      } catch {}
+      recognitionRef.current = null
+    }
+
+    setIsListening(false)
+
+    // If text was accumulated, process it immediately upon user tap
+    const captured = transcriptRef.current.trim()
+    if (captured && status === 'LISTENING') {
+      processCommand(captured)
+    } else if (status === 'LISTENING') {
+      setStatus('IDLE')
+    }
+  }, [processCommand, status])
+
+  const startListening = async () => {
     setTranscript('')
+    transcriptRef.current = ''
     setResponseMessage('')
 
     if (typeof window === 'undefined') return
 
+    // Stop any ongoing speech playback
+    if (audioRef.current) {
+      audioRef.current.pause()
+      audioRef.current = null
+    }
+    window.speechSynthesis.cancel()
+    setIsSpeaking(false)
+
+    // Pre-flight mic permission verification (prompts browser to allow microphone)
+    if (navigator?.mediaDevices?.getUserMedia) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+        // Immediately release tracks once access is verified
+        stream.getTracks().forEach((track) => track.stop())
+      } catch (err: any) {
+        console.warn('Microphone permission check failed:', err)
+        setResponseMessage(
+          'Microphone permission blocked or device unavailable. Allow microphone in your browser address bar.'
+        )
+        setStatus('IDLE')
+        setIsListening(false)
+        return
+      }
+    }
+
     const SpeechRec = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
     if (!SpeechRec) {
-      setResponseMessage('Web Speech API not supported in this client. Use prompt buttons below.')
+      setResponseMessage('Web Speech API is not supported in this browser. Please use the quick prompt buttons.')
       return
     }
 
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.abort()
+      } catch {}
+    }
+
     const recognition = new SpeechRec()
-    recognition.continuous = false
+    recognition.continuous = true
     recognition.interimResults = true
-    recognition.lang = 'en-KE'
+
+    // Use browser language or en-US (en-KE causes instant language-not-supported on Windows Chromium)
+    const browserLang = typeof navigator !== 'undefined' ? navigator.language : 'en-US'
+    recognition.lang = browserLang || 'en-US'
 
     recognition.onstart = () => {
       setIsListening(true)
@@ -241,51 +302,118 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
     }
 
     recognition.onresult = (event: any) => {
-      let finalTranscript = ''
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        if (event.results[i].isFinal) {
-          finalTranscript += event.results[i][0].transcript
+      let interim = ''
+      let final = ''
+
+      for (let i = 0; i < event.results.length; i++) {
+        const item = event.results[i]
+        if (item.isFinal) {
+          final += item[0].transcript + ' '
         } else {
-          setTranscript(event.results[i][0].transcript)
+          interim += item[0].transcript
         }
       }
 
-      if (finalTranscript) {
-        setTranscript(finalTranscript)
-        recognition.stop()
-        processCommand(finalTranscript)
+      const combined = (final + interim).trim()
+      setTranscript(combined)
+      transcriptRef.current = combined
+
+      if (silenceTimerRef.current) {
+        clearTimeout(silenceTimerRef.current)
+      }
+
+      // Auto-submit after 1.8 seconds of silence once user speaks a meaningful phrase
+      if (combined.length >= 3) {
+        silenceTimerRef.current = setTimeout(() => {
+          if (recognitionRef.current) {
+            try {
+              recognitionRef.current.stop()
+            } catch {}
+          }
+          setIsListening(false)
+          processCommand(combined)
+        }, 1800)
       }
     }
 
-    recognition.onerror = () => {
+    recognition.onerror = (event: any) => {
+      console.warn('Speech recognition error event:', event?.error)
+      const err = event?.error
+
+      if (err === 'not-allowed' || err === 'service-not-allowed') {
+        setResponseMessage('Microphone access blocked. Click the lock/settings icon in the browser address bar to allow.')
+      } else if (err === 'language-not-supported') {
+        console.warn('Language not supported, retrying with en-US fallback')
+        recognition.lang = 'en-US'
+        try {
+          recognition.start()
+          return
+        } catch {}
+      } else if (err === 'no-speech') {
+        if (!transcriptRef.current) {
+          setResponseMessage('No voice activity detected. Speak into your microphone or tap a prompt button.')
+        }
+      } else if (err === 'audio-capture') {
+        setResponseMessage('No microphone hardware detected. Please connect an audio input device.')
+      } else {
+        if (!transcriptRef.current) {
+          setResponseMessage(`Voice input stopped: [${err || 'unknown'}]. Tap to retry or use macros.`)
+        }
+      }
+
       setIsListening(false)
       setStatus('IDLE')
     }
 
     recognition.onend = () => {
       setIsListening(false)
+      if (transcriptRef.current.trim() && status === 'LISTENING') {
+        processCommand(transcriptRef.current.trim())
+      } else if (status === 'LISTENING') {
+        setStatus('IDLE')
+      }
     }
 
     recognitionRef.current = recognition
     try {
       recognition.start()
-    } catch (e) {
-      console.error(e)
+    } catch (e: any) {
+      console.error('Failed to start recognition:', e)
+      setResponseMessage('Failed to initialize microphone. Please click to retry.')
+      setIsListening(false)
+      setStatus('IDLE')
     }
-  }
-
-  const stopListening = () => {
-    if (recognitionRef.current) {
-      recognitionRef.current.stop()
-    }
-    setIsListening(false)
-    setStatus('IDLE')
   }
 
   const triggerSample = (phrase: string) => {
     setTranscript(phrase)
     processCommand(phrase)
   }
+
+  useEffect(() => {
+    if (!isOpen) {
+      if (silenceTimerRef.current) {
+        clearTimeout(silenceTimerRef.current)
+        silenceTimerRef.current = null
+      }
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.abort()
+        } catch {}
+        recognitionRef.current = null
+      }
+      if (audioRef.current) {
+        audioRef.current.pause()
+        audioRef.current = null
+      }
+      if (typeof window !== 'undefined') {
+        window.speechSynthesis?.cancel()
+      }
+      setIsListening(false)
+      setIsSpeaking(false)
+      setStatus('IDLE')
+    }
+  }, [isOpen])
 
   if (!isOpen) return null
 
@@ -313,7 +441,7 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
           <div className="w-full bg-[#050608] border border-[#1e2028] p-4 mb-5">
             <div className="flex items-center justify-between text-[10px] text-[#9497a1] pb-2 border-b border-[#181a22] mb-3">
               <span>INPUT STATUS: <strong className={status === 'LISTENING' ? 'text-blue-400' : 'text-white'}>[{status}]</strong></span>
-              <span>SAMPLING: 44.1kHz • EN-KE</span>
+              <span>AUDIO ENGINE: ELEVENLABS NEURAL // MULTILINGUAL</span>
               <span>LOC: NAIROBI_CORRIDOR</span>
             </div>
 
