@@ -37,30 +37,30 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0c] text-[#e2e2e8] tactical-grid font-mono flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 selection:bg-[#d2ff00] selection:text-black">
+    <div className="min-h-screen bg-[#0a0a0c] text-[#e2e4e9] tactical-grid font-mono flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 selection:bg-blue-600 selection:text-white">
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center space-y-2">
         <Link href="/" className="inline-flex items-center gap-2">
-          <div className="w-8 h-8 bg-[#d2ff00] text-black font-black flex items-center justify-center text-sm">
+          <div className="w-8 h-8 bg-blue-600 text-white font-black flex items-center justify-center text-sm">
             SH
           </div>
           <span className="text-xl font-black text-white uppercase tracking-tight">SUPPLIER HUB // OPS</span>
         </Link>
-        <p className="text-xs text-[#777785] uppercase tracking-wider">
+        <p className="text-xs text-[#9497a1] uppercase tracking-wider">
           REGISTER NEW OPERATOR NODE // NAIROBI NETWORK
         </p>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-[#0e0e13] border-2 border-[#242430] p-6 sm:p-8 space-y-5">
+        <div className="bg-[#0e0f13] border-2 border-[#242630] p-6 sm:p-8 space-y-5">
           <form className="space-y-4 text-xs" onSubmit={handleStandardSignUp}>
             {error && (
-              <div className="p-2.5 bg-[#250d0d] border border-[#551818] text-[#ff6b6b] text-[11px] font-bold">
+              <div className="p-2.5 bg-[#14151a] border border-blue-500/50 text-white text-[11px] font-bold">
                 {error}
               </div>
             )}
 
             <div>
-              <label className="text-[10px] text-[#777785] uppercase block mb-1">
+              <label className="text-[10px] text-[#9497a1] uppercase block mb-1">
                 OPERATOR / BUSINESS IDENTIFIER
               </label>
               <input
@@ -69,12 +69,12 @@ export default function SignUpPage() {
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="e.g. Mama Sarah Fresh Kiosk"
-                className="w-full bg-[#0a0a0e] border border-[#282838] text-white py-2 px-3 font-mono font-bold"
+                className="w-full bg-[#090a0d] border border-[#22242c] text-white py-2 px-3 font-mono font-bold"
               />
             </div>
 
             <div>
-              <label className="text-[10px] text-[#777785] uppercase block mb-1">
+              <label className="text-[10px] text-[#9497a1] uppercase block mb-1">
                 NODE ROLE ASSIGNMENT
               </label>
               <div className="grid grid-cols-2 gap-2 text-[11px]">
@@ -90,19 +90,19 @@ export default function SignUpPage() {
                     onClick={() => setRole(r)}
                     className={`p-2 border text-left transition-all ${
                       role === r
-                        ? 'border-[#d2ff00] bg-[#14141c] text-[#d2ff00] font-black'
-                        : 'border-[#22222d] bg-[#0a0a0e] text-[#777785] hover:text-white'
+                        ? 'border-blue-500 bg-blue-950/40 text-blue-300 font-black'
+                        : 'border-[#22242c] bg-[#090a0d] text-[#9497a1] hover:text-white'
                     }`}
                   >
                     <span className="block font-bold">{label}</span>
-                    <span className="text-[9px] text-[#555562] block">{desc}</span>
+                    <span className="text-[9px] text-[#616572] block">{desc}</span>
                   </button>
                 ))}
               </div>
             </div>
 
             <div>
-              <label className="text-[10px] text-[#777785] uppercase block mb-1">
+              <label className="text-[10px] text-[#9497a1] uppercase block mb-1">
                 OPERATOR EMAIL // TRANSMISSION ADDRESS
               </label>
               <input
@@ -111,12 +111,12 @@ export default function SignUpPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="operator@domain.co.ke"
-                className="w-full bg-[#0a0a0e] border border-[#282838] text-white py-2 px-3 font-mono font-bold"
+                className="w-full bg-[#090a0d] border border-[#22242c] text-white py-2 px-3 font-mono font-bold"
               />
             </div>
 
             <div>
-              <label className="text-[10px] text-[#777785] uppercase block mb-1">
+              <label className="text-[10px] text-[#9497a1] uppercase block mb-1">
                 SECURE ACCESS KEY
               </label>
               <input
@@ -125,21 +125,21 @@ export default function SignUpPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full bg-[#0a0a0e] border border-[#282838] text-white py-2 px-3 font-mono font-bold"
+                className="w-full bg-[#090a0d] border border-[#22242c] text-white py-2 px-3 font-mono font-bold"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-[#d2ff00] hover:bg-[#b8e000] text-black font-black uppercase tracking-wider text-xs transition-colors flex items-center justify-center gap-2"
+              className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-wider text-xs transition-colors flex items-center justify-center gap-2"
             >
               <span>{loading ? 'REGISTERING...' : 'INITIALIZE NODE ACCESS »'}</span>
             </button>
           </form>
 
-          <div className="text-center pt-2 border-t border-[#1e1e26]">
-            <Link href="/login" className="text-xs text-[#888894] hover:text-[#d2ff00] transition-colors">
+          <div className="text-center pt-2 border-t border-[#1e2028]">
+            <Link href="/login" className="text-xs text-[#9497a1] hover:text-blue-400 transition-colors">
               [EXISTING OPERATOR? PROCEED TO AUTHENTICATION]
             </Link>
           </div>

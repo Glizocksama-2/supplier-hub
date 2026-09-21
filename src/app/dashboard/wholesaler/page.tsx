@@ -71,28 +71,28 @@ export default function WholesalerDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0c] text-[#e2e2e8] tactical-grid font-mono flex flex-col selection:bg-[#d2ff00] selection:text-black">
+    <div className="min-h-screen bg-[#0a0a0c] text-[#e2e4e9] tactical-grid font-mono flex flex-col selection:bg-blue-600 selection:text-white">
       <DemoRoleSwitcher />
 
       <main className="flex-1 max-w-[1500px] w-full mx-auto px-4 sm:px-6 py-6 space-y-6">
         {/* Wholesaler Header */}
-        <div className="bg-[#0f0f14] border-2 border-[#262632] p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="bg-[#0e0f13] border-2 border-[#242630] p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 text-[10px] text-blue-400 font-black tracking-wider uppercase mb-1">
-              <span className="w-2 h-2 bg-blue-400 animate-pulse" />
+              <span className="w-2 h-2 bg-blue-500 animate-pulse" />
               <span>TERMINAL NODE // WHOLESALE_DEPOT_02</span>
             </div>
             <h1 className="text-2xl font-black text-white uppercase tracking-tight">
               {currentUser.business_name}
             </h1>
-            <p className="text-xs text-[#7d7d8c] mt-0.5">
+            <p className="text-xs text-[#9497a1] mt-0.5">
               LOC: {currentUser.address} • PHONE: {currentUser.phone}
             </p>
           </div>
 
           <button
             onClick={() => setIsAddModalOpen(true)}
-            className="px-4 py-2.5 bg-blue-500 hover:bg-blue-600 text-black font-black text-xs uppercase tracking-wider flex items-center gap-2 transition-colors"
+            className="px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-black text-xs uppercase tracking-wider flex items-center gap-2 transition-colors"
           >
             <Plus className="w-4 h-4" />
             <span>[LIST BULK COMMODITY]</span>
@@ -101,30 +101,30 @@ export default function WholesalerDashboard() {
 
         {/* Tactical Metrics Bar */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <div className="p-4 bg-[#0e0e13] border border-[#22222a]">
-            <span className="text-[10px] text-[#777785] uppercase block font-bold">PENDING REQUISITIONS</span>
-            <p className="text-2xl font-black text-[#ff6b00] mt-1">{pendingOrders.length}</p>
+          <div className="p-4 bg-[#0e0f13] border border-[#22242b]">
+            <span className="text-[10px] text-[#9497a1] uppercase block font-bold">PENDING REQUISITIONS</span>
+            <p className="text-2xl font-black text-blue-400 mt-1">{pendingOrders.length}</p>
           </div>
-          <div className="p-4 bg-[#0e0e13] border border-[#22222a]">
-            <span className="text-[10px] text-[#777785] uppercase block font-bold">CARRIERS IN TRANSIT</span>
-            <p className="text-2xl font-black text-blue-400 mt-1">{activeOrders.length}</p>
+          <div className="p-4 bg-[#0e0f13] border border-[#22242b]">
+            <span className="text-[10px] text-[#9497a1] uppercase block font-bold">CARRIERS IN TRANSIT</span>
+            <p className="text-2xl font-black text-white mt-1">{activeOrders.length}</p>
           </div>
-          <div className="p-4 bg-[#0e0e13] border border-[#22222a]">
-            <span className="text-[10px] text-[#777785] uppercase block font-bold">FULFILLED INVOICES</span>
-            <p className="text-2xl font-black text-[#d2ff00] mt-1">{completedOrders.length}</p>
+          <div className="p-4 bg-[#0e0f13] border border-[#22242b]">
+            <span className="text-[10px] text-[#9497a1] uppercase block font-bold">FULFILLED INVOICES</span>
+            <p className="text-2xl font-black text-white mt-1">{completedOrders.length}</p>
           </div>
-          <div className="p-4 bg-[#0e0e13] border border-[#22222a]">
-            <span className="text-[10px] text-[#777785] uppercase block font-bold">ACTIVE DEPOT LISTINGS</span>
-            <p className="text-2xl font-black text-white mt-1">{myListings.length}</p>
+          <div className="p-4 bg-[#0e0f13] border border-[#22242b]">
+            <span className="text-[10px] text-[#9497a1] uppercase block font-bold">ACTIVE DEPOT LISTINGS</span>
+            <p className="text-2xl font-black text-blue-400 mt-1">{myListings.length}</p>
           </div>
         </div>
 
         {/* Incoming Kiosk Requisitions Action Queue */}
         {pendingOrders.length > 0 && (
           <section className="space-y-3">
-            <div className="flex items-center justify-between border-b border-[#ff6b00]/30 pb-2">
-              <div className="flex items-center gap-2 text-xs font-black text-[#ff6b00] uppercase tracking-wider">
-                <Clock className="w-4 h-4 text-[#ff6b00]" />
+            <div className="flex items-center justify-between border-b border-[#242630] pb-2">
+              <div className="flex items-center gap-2 text-xs font-black text-white uppercase tracking-wider">
+                <Clock className="w-4 h-4 text-blue-400" />
                 <span>INCOMING KIOSK REQUISITIONS // {pendingOrders.length} AWAITING DISPATCH</span>
               </div>
             </div>
@@ -133,12 +133,12 @@ export default function WholesalerDashboard() {
               {pendingOrders.map((ord) => (
                 <div
                   key={ord.id}
-                  className="bg-[#120f0a] border-2 border-[#ff6b00] p-4 flex flex-col md:flex-row md:items-center justify-between gap-4"
+                  className="bg-[#0e0f13] border-2 border-blue-600 p-4 flex flex-col md:flex-row md:items-center justify-between gap-4"
                 >
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-black text-white">REQUISITION #{ord.id}</span>
-                      <span className="text-[10px] font-bold px-2 py-0.5 bg-[#ff6b00]/20 text-[#ff6b00] border border-[#ff6b00]/40 uppercase">
+                      <span className="text-[10px] font-bold px-2 py-0.5 bg-blue-950/40 text-blue-300 border border-blue-500/40 uppercase">
                         ACTION REQUIRED
                       </span>
                     </div>
@@ -146,22 +146,22 @@ export default function WholesalerDashboard() {
                     <p className="text-sm font-bold text-white">
                       {ord.retailer?.business_name || 'Retailer'}: {ord.quantity} {ord.product?.unit} {ord.product?.name}
                     </p>
-                    <p className="text-xs text-[#888894]">
+                    <p className="text-xs text-[#9497a1]">
                       DESTINATION: {ord.delivery_address}
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-4 border-t md:border-t-0 md:border-l border-[#2d2518] pt-3 md:pt-0 md:pl-4">
+                  <div className="flex items-center gap-4 border-t md:border-t-0 md:border-l border-[#22242c] pt-3 md:pt-0 md:pl-4">
                     <div className="text-right">
-                      <span className="text-[10px] text-[#777785] uppercase block">INVOICE AMOUNT</span>
-                      <span className="text-lg font-black text-[#d2ff00]">
+                      <span className="text-[10px] text-[#616572] uppercase block">INVOICE AMOUNT</span>
+                      <span className="text-lg font-black text-white">
                         KSh {ord.total_amount?.toLocaleString()}
                       </span>
                     </div>
 
                     <button
                       onClick={() => supplierConfirmOrder(ord.id)}
-                      className="px-4 py-2.5 bg-[#d2ff00] hover:bg-[#b8e000] text-black font-black text-xs uppercase tracking-wider transition-colors"
+                      className="px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-black text-xs uppercase tracking-wider transition-colors"
                     >
                       CONFIRM & DISPATCH BODA »
                     </button>
@@ -173,18 +173,18 @@ export default function WholesalerDashboard() {
         )}
 
         {/* Wholesale Inventory & Dynamic Rate Controls */}
-        <section className="bg-[#0e0e13] border border-[#242430] p-5 space-y-4">
-          <div className="flex items-center justify-between border-b border-[#1c1c24] pb-3">
+        <section className="bg-[#0e0f13] border border-[#242630] p-5 space-y-4">
+          <div className="flex items-center justify-between border-b border-[#1c1e26] pb-3">
             <h2 className="text-sm font-black text-white uppercase tracking-wider">
               DEPOT COMMODITY LISTINGS & RATE CONTROL
             </h2>
-            <span className="text-[10px] text-[#666675]">LIVE B2B WHOLESALE RATES</span>
+            <span className="text-[10px] text-[#616572]">LIVE B2B WHOLESALE RATES</span>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead>
-                <tr className="text-[10px] text-[#666675] uppercase border-b border-[#20202a]">
+                <tr className="text-[10px] text-[#616572] uppercase border-b border-[#20222a]">
                   <th className="pb-2 font-bold">COMMODITY</th>
                   <th className="pb-2 font-bold">CATEGORY</th>
                   <th className="pb-2 font-bold">WHOLESALE RATE</th>
@@ -193,36 +193,36 @@ export default function WholesalerDashboard() {
                   <th className="pb-2 font-bold text-right">PRICE CALIBRATION</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#181820]">
+              <tbody className="divide-y divide-[#181a22]">
                 {myListings.map((list) => (
-                  <tr key={list.id} className="hover:bg-[#14141c] transition-colors">
+                  <tr key={list.id} className="hover:bg-[#12141c] transition-colors">
                     <td className="py-3 font-bold text-white uppercase">
                       {list.product?.name}
                     </td>
-                    <td className="py-3 text-[11px] text-[#787884]">{list.product?.category}</td>
+                    <td className="py-3 text-[11px] text-[#9497a1]">{list.product?.category}</td>
                     <td className="py-3">
-                      <span className="font-black text-[#d2ff00] text-sm">
+                      <span className="font-black text-blue-400 text-sm">
                         KSh {list.price_per_unit}
                       </span>
-                      <span className="text-[10px] text-[#666675]">/{list.unit}</span>
+                      <span className="text-[10px] text-[#616572]">/{list.unit}</span>
                     </td>
                     <td className="py-3 font-bold text-white">
                       {list.available_stock} {list.unit}
                     </td>
-                    <td className="py-3 text-[11px] text-[#787884]">{list.delivery_radius_km} KM</td>
+                    <td className="py-3 text-[11px] text-[#9497a1]">{list.delivery_radius_km} KM</td>
                     <td className="py-3 text-right">
                       <div className="inline-flex items-center gap-1">
                         <button
                           onClick={() =>
                             updateListing(list.id, { price_per_unit: Math.max(10, list.price_per_unit - 5) })
                           }
-                          className="px-2 py-0.5 bg-[#181820] hover:bg-[#262634] text-white border border-[#282836] text-[10px] font-bold"
+                          className="px-2 py-0.5 bg-[#14151a] hover:bg-[#1e2028] text-white border border-[#262832] text-[10px] font-bold"
                         >
                           -5 KSH
                         </button>
                         <button
                           onClick={() => updateListing(list.id, { price_per_unit: list.price_per_unit + 5 })}
-                          className="px-2 py-0.5 bg-[#181820] hover:bg-[#262634] text-white border border-[#282836] text-[10px] font-bold"
+                          className="px-2 py-0.5 bg-[#14151a] hover:bg-[#1e2028] text-white border border-[#262832] text-[10px] font-bold"
                         >
                           +5 KSH
                         </button>
@@ -300,7 +300,7 @@ export default function WholesalerDashboard() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-black font-black uppercase"
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-wider"
                 >
                   COMMIT LISTING »
                 </button>

@@ -35,7 +35,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="SupplierHub" />
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
       </head>
-      <body className="min-h-screen bg-[#0a0a0c] text-[#e2e2e8] antialiased selection:bg-[#d2ff00] selection:text-black font-sans">
+      <body className="min-h-screen bg-[#0a0a0c] text-[#e2e4e9] antialiased selection:bg-blue-600 selection:text-white font-sans">
         {children}
       </body>
     </html>

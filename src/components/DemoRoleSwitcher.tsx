@@ -52,18 +52,18 @@ export function DemoRoleSwitcher() {
             {/* Left: Terminal Branding */}
             <div className="flex items-center justify-between gap-3">
               <Link href="/" className="flex items-center gap-2 group">
-                <div className="w-6 h-6 bg-[#d2ff00] text-black font-black flex items-center justify-center text-xs group-hover:bg-white transition-colors">
+                <div className="w-6 h-6 bg-blue-600 text-white font-black flex items-center justify-center text-xs group-hover:bg-blue-500 transition-colors">
                   SH
                 </div>
                 <div className="flex items-center gap-2 font-bold tracking-tight">
                   <span className="text-white text-sm">SUPPLIER-HUB</span>
-                  <span className="text-[#555562] text-[10px] hidden sm:inline">// NAIROBI_CORRIDOR_V2</span>
+                  <span className="text-[#616572] text-[10px] hidden sm:inline">// NAIROBI_CORRIDOR_V2</span>
                 </div>
               </Link>
 
               <div className="flex items-center gap-2">
-                <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 border border-[#242429] bg-[#141418] text-[#888892] text-[10px]">
-                  <span className="w-1.5 h-1.5 bg-[#d2ff00] animate-ping" />
+                <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 border border-[#22242b] bg-[#121316] text-[#9497a1] text-[10px]">
+                  <span className="w-1.5 h-1.5 bg-blue-500 animate-ping" />
                   ONLINE: EAT_GMT+3
                 </span>
 
@@ -71,17 +71,17 @@ export function DemoRoleSwitcher() {
                 <div className="flex items-center gap-1.5 lg:hidden">
                   <button
                     onClick={() => setIsVoiceOpen(true)}
-                    className="p-1.5 bg-[#d2ff00] text-black font-bold"
+                    className="p-1.5 bg-blue-600 text-white font-bold"
                   >
                     <Mic className="w-3.5 h-3.5" />
                   </button>
                   <button
                     onClick={() => setIsNotifsOpen(!isNotifsOpen)}
-                    className="p-1.5 bg-[#1a1a20] text-white border border-[#2e2e38] relative"
+                    className="p-1.5 bg-[#14151a] text-white border border-[#262832] relative"
                   >
                     <Bell className="w-3.5 h-3.5" />
                     {unreadCount > 0 && (
-                      <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-[#ff6b00] text-black text-[9px] font-black flex items-center justify-center">
+                      <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-blue-600 text-white text-[9px] font-black flex items-center justify-center">
                         {unreadCount}
                       </span>
                     )}
@@ -91,7 +91,7 @@ export function DemoRoleSwitcher() {
             </div>
 
             {/* Center: Tactical Persona Toggle Grid */}
-            <div className="flex items-center gap-1 overflow-x-auto bg-[#08080a] p-1 border border-[#222228]">
+            <div className="flex items-center gap-1 overflow-x-auto bg-[#09090b] p-1 border border-[#22242b]">
               {roles.map(({ role, code, label, path, name }) => {
                 const isActive = pathname.includes(role) || currentRole === role
                 return (
@@ -100,15 +100,15 @@ export function DemoRoleSwitcher() {
                     onClick={() => handleSwitch(role, path)}
                     className={`flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] font-mono tracking-wider uppercase whitespace-nowrap transition-all ${
                       isActive
-                        ? 'bg-[#d2ff00] text-black font-black shadow-sm'
-                        : 'text-[#8e8e9c] hover:text-white hover:bg-[#16161c]'
+                        ? 'bg-blue-600 text-white font-bold shadow-sm'
+                        : 'text-[#9497a1] hover:text-white hover:bg-[#14161f]'
                     }`}
                   >
-                    <span className={isActive ? 'text-black font-bold opacity-70' : 'text-[#ff6b00]'}>
+                    <span className={isActive ? 'text-blue-200 font-bold' : 'text-blue-400'}>
                       [{code}]
                     </span>
                     <span>{label}</span>
-                    <span className={`text-[9px] hidden xl:inline ${isActive ? 'text-black/70' : 'text-[#555562]'}`}>
+                    <span className={`text-[9px] hidden xl:inline ${isActive ? 'text-blue-100' : 'text-[#616572]'}`}>
                       ({name})
                     </span>
                   </button>
@@ -121,9 +121,9 @@ export function DemoRoleSwitcher() {
               {/* Voice HUD launcher */}
               <button
                 onClick={() => setIsVoiceOpen(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-[#18181f] hover:bg-[#22222a] border border-[#33333e] text-[#d2ff00] hover:border-[#d2ff00] transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-[#121318] hover:bg-[#181a22] border border-[#262834] text-white hover:border-blue-500 transition-colors"
               >
-                <Mic className="w-3.5 h-3.5 animate-pulse" />
+                <Mic className="w-3.5 h-3.5 text-blue-400" />
                 <span className="text-[11px] font-bold">VOICE HUD</span>
               </button>
 
@@ -133,48 +133,48 @@ export function DemoRoleSwitcher() {
                   onClick={() => setIsNotifsOpen(!isNotifsOpen)}
                   className={`flex items-center gap-1.5 px-2.5 py-1.5 border transition-colors ${
                     unreadCount > 0
-                      ? 'border-[#ff6b00] bg-[#ff6b00]/10 text-[#ff6b00]'
-                      : 'border-[#242429] bg-[#141418] text-[#888892] hover:text-white'
+                      ? 'border-blue-500 bg-blue-950/40 text-blue-300'
+                      : 'border-[#22242b] bg-[#121316] text-[#9497a1] hover:text-white'
                   }`}
                 >
-                  <Bell className="w-3.5 h-3.5" />
+                  <Bell className="w-3.5 h-3.5 text-blue-400" />
                   <span className="text-[11px] font-bold">{unreadCount} ALERTS</span>
                 </button>
 
                 {/* Dropdown */}
                 {isNotifsOpen && (
-                  <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-[#0e0e12] border-2 border-[#33333d] shadow-2xl p-3 z-50 animate-in fade-in">
-                    <div className="flex items-center justify-between pb-2 border-b border-[#242429]">
-                      <span className="text-[11px] font-black text-[#d2ff00] uppercase tracking-wider">
+                  <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-[#0c0d10] border-2 border-[#2b2e38] shadow-2xl p-3 z-50 animate-in fade-in">
+                    <div className="flex items-center justify-between pb-2 border-b border-[#22242b]">
+                      <span className="text-[11px] font-black text-blue-400 uppercase tracking-wider">
                         // DISPATCH EVENT LOG
                       </span>
                       <button
                         onClick={markAllNotificationsRead}
-                        className="text-[10px] text-[#888892] hover:text-white underline uppercase"
+                        className="text-[10px] text-[#9497a1] hover:text-white underline uppercase"
                       >
                         [CLEAR ALL]
                       </button>
                     </div>
 
-                    <div className="max-h-80 overflow-y-auto divide-y divide-[#1e1e24] py-1">
+                    <div className="max-h-80 overflow-y-auto divide-y divide-[#1c1e26] py-1">
                       {notifications.length === 0 ? (
-                        <p className="text-[11px] text-[#555562] py-4 text-center">NO RECENT DISPATCH LOGS</p>
+                        <p className="text-[11px] text-[#616572] py-4 text-center">NO RECENT DISPATCH LOGS</p>
                       ) : (
                         notifications.slice(0, 10).map((n) => (
                           <div
                             key={n.id}
                             onClick={() => markNotificationRead(n.id)}
                             className={`py-2.5 px-2 text-left cursor-pointer transition-colors ${
-                              !n.is_read ? 'bg-[#181822] border-l-2 border-[#ff6b00]' : 'hover:bg-[#14141a]'
+                              !n.is_read ? 'bg-[#141724] border-l-2 border-blue-500' : 'hover:bg-[#121318]'
                             }`}
                           >
                             <div className="flex items-center justify-between">
                               <span className="text-[10px] font-bold text-white uppercase">{n.title}</span>
-                              <span className="text-[9px] text-[#555562]">
+                              <span className="text-[9px] text-[#616572]">
                                 {new Date(n.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                               </span>
                             </div>
-                            <p className="text-[11px] text-[#a0a0ae] mt-1 leading-snug">{n.message}</p>
+                            <p className="text-[11px] text-[#9497a1] mt-1 leading-snug">{n.message}</p>
                           </div>
                         ))
                       )}

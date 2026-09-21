@@ -39,45 +39,45 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0c] text-[#e2e2e8] tactical-grid font-mono flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 selection:bg-[#d2ff00] selection:text-black">
+    <div className="min-h-screen bg-[#0a0a0c] text-[#e2e4e9] tactical-grid font-mono flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 selection:bg-blue-600 selection:text-white">
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center space-y-2">
         <Link href="/" className="inline-flex items-center gap-2">
-          <div className="w-8 h-8 bg-[#d2ff00] text-black font-black flex items-center justify-center text-sm">
+          <div className="w-8 h-8 bg-blue-600 text-white font-black flex items-center justify-center text-sm">
             SH
           </div>
           <span className="text-xl font-black text-white uppercase tracking-tight">SUPPLIER HUB // OPS</span>
         </Link>
-        <p className="text-xs text-[#777785] uppercase tracking-wider">
+        <p className="text-xs text-[#9497a1] uppercase tracking-wider">
           AUTHENTICATE TERMINAL SESSION // NAIROBI NETWORK
         </p>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-[#0e0e13] border-2 border-[#242430] p-6 sm:p-8 space-y-6">
+        <div className="bg-[#0e0f13] border-2 border-[#242630] p-6 sm:p-8 space-y-6">
           {/* Quick Hardware Macro Access */}
-          <div className="p-4 bg-[#14141c] border border-[#2d2d3c] space-y-3">
-            <div className="flex items-center justify-between text-[11px] font-black uppercase text-[#d2ff00]">
+          <div className="p-4 bg-[#111216] border border-[#22242b] space-y-3">
+            <div className="flex items-center justify-between text-[11px] font-black uppercase text-blue-400">
               <span className="flex items-center gap-1.5">
-                <Zap className="w-3.5 h-3.5 fill-[#d2ff00]" />
+                <Zap className="w-3.5 h-3.5 fill-blue-400 text-blue-400" />
                 HARDWARE BYPASS // 1-CLICK DEMO ACCESS
               </span>
-              <span className="text-[9px] text-[#777785]">NO_PASSWORD</span>
+              <span className="text-[9px] text-[#616572]">NO_PASSWORD</span>
             </div>
 
             <div className="grid grid-cols-2 gap-2 text-xs">
               <button
                 type="button"
                 onClick={() => handleQuickDemoLogin('retailer')}
-                className="p-2.5 bg-[#0a0a0e] hover:bg-[#1a1a24] border border-[#252535] hover:border-[#d2ff00] text-left transition-colors"
+                className="p-2.5 bg-[#090a0d] hover:bg-[#14161f] border border-[#22242c] hover:border-blue-500 text-left transition-colors"
               >
-                <span className="text-[10px] text-[#d2ff00] font-bold block">[01] RETAILER</span>
+                <span className="text-[10px] text-blue-400 font-bold block">[01] RETAILER</span>
                 <span className="text-white font-bold text-xs truncate block">Mama Sarah Kiosk</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => handleQuickDemoLogin('wholesaler')}
-                className="p-2.5 bg-[#0a0a0e] hover:bg-[#1a1a24] border border-[#252535] hover:border-blue-400 text-left transition-colors"
+                className="p-2.5 bg-[#090a0d] hover:bg-[#14161f] border border-[#22242c] hover:border-blue-500 text-left transition-colors"
               >
                 <span className="text-[10px] text-blue-400 font-bold block">[02] WHOLESALE</span>
                 <span className="text-white font-bold text-xs truncate block">Kilimo Traders</span>
@@ -86,39 +86,39 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => handleQuickDemoLogin('farmer')}
-                className="p-2.5 bg-[#0a0a0e] hover:bg-[#1a1a24] border border-[#252535] hover:border-emerald-400 text-left transition-colors"
+                className="p-2.5 bg-[#090a0d] hover:bg-[#14161f] border border-[#22242c] hover:border-blue-500 text-left transition-colors"
               >
-                <span className="text-[10px] text-emerald-400 font-bold block">[03] FARM GATE</span>
+                <span className="text-[10px] text-blue-400 font-bold block">[03] FARM GATE</span>
                 <span className="text-white font-bold text-xs truncate block">Green Valley Co-op</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => handleQuickDemoLogin('boda_rider')}
-                className="p-2.5 bg-[#0a0a0e] hover:bg-[#1a1a24] border border-[#252535] hover:border-[#ff6b00] text-left transition-colors"
+                className="p-2.5 bg-[#090a0d] hover:bg-[#14161f] border border-[#22242c] hover:border-blue-500 text-left transition-colors"
               >
-                <span className="text-[10px] text-[#ff6b00] font-bold block">[04] BODA RADAR</span>
+                <span className="text-[10px] text-blue-400 font-bold block">[04] BODA RADAR</span>
                 <span className="text-white font-bold text-xs truncate block">James Otieno</span>
               </button>
             </div>
           </div>
 
-          <div className="flex items-center text-xs text-[#555562] uppercase">
-            <div className="flex-grow border-t border-[#1e1e26]" />
+          <div className="flex items-center text-xs text-[#616572] uppercase">
+            <div className="flex-grow border-t border-[#1e2028]" />
             <span className="px-3">Or Credentials</span>
-            <div className="flex-grow border-t border-[#1e1e26]" />
+            <div className="flex-grow border-t border-[#1e2028]" />
           </div>
 
           {/* Form */}
           <form className="space-y-4 text-xs" onSubmit={handleStandardLogin}>
             {error && (
-              <div className="p-2.5 bg-[#250d0d] border border-[#551818] text-[#ff6b6b] text-[11px] font-bold">
+              <div className="p-2.5 bg-[#14151a] border border-blue-500/50 text-white text-[11px] font-bold">
                 {error}
               </div>
             )}
 
             <div>
-              <label className="text-[10px] text-[#777785] uppercase block mb-1">
+              <label className="text-[10px] text-[#9497a1] uppercase block mb-1">
                 OPERATOR ID // EMAIL
               </label>
               <input
@@ -127,12 +127,12 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="operator@supplierhub.co.ke"
-                className="w-full bg-[#0a0a0e] border border-[#282838] text-white py-2 px-3 font-mono font-bold"
+                className="w-full bg-[#090a0d] border border-[#22242c] text-white py-2 px-3 font-mono font-bold"
               />
             </div>
 
             <div>
-              <label className="text-[10px] text-[#777785] uppercase block mb-1">
+              <label className="text-[10px] text-[#9497a1] uppercase block mb-1">
                 ACCESS KEY // PASSWORD
               </label>
               <input
@@ -141,21 +141,21 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full bg-[#0a0a0e] border border-[#282838] text-white py-2 px-3 font-mono font-bold"
+                className="w-full bg-[#090a0d] border border-[#22242c] text-white py-2 px-3 font-mono font-bold"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-[#d2ff00] hover:bg-[#b8e000] text-black font-black uppercase tracking-wider text-xs transition-colors flex items-center justify-center gap-2"
+              className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-wider text-xs transition-colors flex items-center justify-center gap-2"
             >
               <span>{loading ? 'AUTHENTICATING...' : 'OPEN SESSION »'}</span>
             </button>
           </form>
 
-          <div className="text-center pt-1 border-t border-[#1e1e26]">
-            <Link href="/signup" className="text-xs text-[#888894] hover:text-[#d2ff00] transition-colors">
+          <div className="text-center pt-1 border-t border-[#1e2028]">
+            <Link href="/signup" className="text-xs text-[#9497a1] hover:text-blue-400 transition-colors">
               [NEW REGISTRATION // CREATE OPERATOR ACCOUNT]
             </Link>
           </div>

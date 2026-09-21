@@ -247,18 +247,18 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-xs p-4 font-mono">
-      <div className="relative w-full max-w-xl bg-[#0c0c10] border-2 border-[#333340] text-[#e2e2e8] shadow-2xl p-6">
+      <div className="relative w-full max-w-xl bg-[#0a0a0d] border-2 border-[#262832] text-[#e2e4e9] shadow-2xl p-6">
         {/* Terminal Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-[#252530]">
+        <div className="flex items-center justify-between pb-3 border-b border-[#22242b]">
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 bg-[#d2ff00]" />
+            <span className="w-2.5 h-2.5 bg-blue-600" />
             <span className="text-xs font-black tracking-widest text-white uppercase">
               VOICE DISPATCH TERMINAL // AUDIO_INPUT_01
             </span>
           </div>
           <button
             onClick={onClose}
-            className="text-[#666675] hover:text-white px-2 py-1 text-xs font-bold border border-[#252530] hover:border-[#444455]"
+            className="text-[#9497a1] hover:text-white px-2 py-1 text-xs font-bold border border-[#22242b] hover:border-[#383b48]"
           >
             [ESC / CLOSE]
           </button>
@@ -266,9 +266,9 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
 
         {/* Audio Visualizer & Frequency Simulation */}
         <div className="py-6 flex flex-col items-center justify-center">
-          <div className="w-full bg-[#070709] border border-[#202028] p-4 mb-5">
-            <div className="flex items-center justify-between text-[10px] text-[#777785] pb-2 border-b border-[#181820] mb-3">
-              <span>INPUT STATUS: <strong className={status === 'LISTENING' ? 'text-[#d2ff00]' : 'text-white'}>[{status}]</strong></span>
+          <div className="w-full bg-[#050608] border border-[#1e2028] p-4 mb-5">
+            <div className="flex items-center justify-between text-[10px] text-[#9497a1] pb-2 border-b border-[#181a22] mb-3">
+              <span>INPUT STATUS: <strong className={status === 'LISTENING' ? 'text-blue-400' : 'text-white'}>[{status}]</strong></span>
               <span>SAMPLING: 44.1kHz • EN-KE</span>
               <span>LOC: NAIROBI_CORRIDOR</span>
             </div>
@@ -280,8 +280,8 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
                   key={i}
                   className={`w-full transition-all duration-100 ${
                     isListening || isSpeaking
-                      ? 'bg-[#d2ff00]'
-                      : 'bg-[#22222c]'
+                      ? 'bg-blue-500'
+                      : 'bg-[#1e2028]'
                   }`}
                   style={{
                     height: isListening || isSpeaking ? `${Math.max(12, Math.round(h * Math.random()))}%` : '8%',
@@ -295,10 +295,10 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
             onClick={isListening ? stopListening : startListening}
             className={`w-full py-4 border text-sm font-black tracking-widest uppercase transition-all flex items-center justify-center gap-3 ${
               isListening
-                ? 'bg-[#ff2b2b] text-white border-[#ff2b2b]'
+                ? 'bg-blue-700 text-white border-blue-500'
                 : isSpeaking
-                ? 'bg-[#24242e] text-[#d2ff00] border-[#d2ff00]'
-                : 'bg-[#d2ff00] hover:bg-[#bce400] text-black border-[#d2ff00]'
+                ? 'bg-blue-950/60 text-blue-300 border-blue-500'
+                : 'bg-blue-600 hover:bg-blue-500 text-white border-blue-600'
             }`}
           >
             {isListening ? (
@@ -308,7 +308,7 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
               </>
             ) : isSpeaking ? (
               <>
-                <Volume2 className="w-5 h-5 animate-bounce" />
+                <Volume2 className="w-5 h-5 animate-bounce text-blue-400" />
                 <span>[TRANSMITTING AUDIO TELEMETRY]</span>
               </>
             ) : (
@@ -321,17 +321,17 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
 
           {/* Transcript telemetry */}
           {transcript && (
-            <div className="w-full mt-4 p-3 bg-[#111116] border border-[#2a2a35] text-left">
-              <span className="text-[10px] text-[#ff6b00] uppercase block mb-0.5">» RECOGNIZED PHRASE:</span>
+            <div className="w-full mt-4 p-3 bg-[#111318] border border-[#222530] text-left">
+              <span className="text-[10px] text-blue-400 uppercase block mb-0.5">» RECOGNIZED PHRASE:</span>
               <p className="text-xs font-bold text-white">"{transcript}"</p>
             </div>
           )}
 
           {/* Response Telemetry */}
           {responseMessage && (
-            <div className="w-full mt-3 p-3 bg-[#0a1208] border border-[#2b5015] text-left">
-              <span className="text-[10px] text-[#d2ff00] uppercase block mb-0.5">» SYSTEM DISPATCH CONFIRMATION:</span>
-              <p className="text-xs font-semibold text-[#c8f8a8] leading-relaxed">
+            <div className="w-full mt-3 p-3 bg-[#0a101d] border border-blue-800/60 text-left">
+              <span className="text-[10px] text-blue-400 uppercase block mb-0.5">» SYSTEM DISPATCH CONFIRMATION:</span>
+              <p className="text-xs font-semibold text-white leading-relaxed">
                 {responseMessage}
               </p>
             </div>
@@ -339,32 +339,32 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
         </div>
 
         {/* Demo Fast Triggers */}
-        <div className="pt-3 border-t border-[#202028]">
-          <span className="text-[10px] text-[#666675] uppercase block mb-2 font-bold">
+        <div className="pt-3 border-t border-[#1e2028]">
+          <span className="text-[10px] text-[#616572] uppercase block mb-2 font-bold">
             // HARDWARE TRIGGER MACROS (TEST WITHOUT MICROPHONE):
           </span>
           <div className="grid grid-cols-2 gap-2 text-[11px]">
             <button
               onClick={() => triggerSample('Order 50kg maize from cheapest supplier')}
-              className="p-2 bg-[#14141a] hover:bg-[#1f1f28] border border-[#242430] hover:border-[#d2ff00] text-left text-white"
+              className="p-2 bg-[#121318] hover:bg-[#181a22] border border-[#22242c] hover:border-blue-500 text-left text-white transition-colors"
             >
               [MACRO 1] » "Order 50kg maize"
             </button>
             <button
               onClick={() => triggerSample('Check stock of tomatoes')}
-              className="p-2 bg-[#14141a] hover:bg-[#1f1f28] border border-[#242430] hover:border-[#d2ff00] text-left text-white"
+              className="p-2 bg-[#121318] hover:bg-[#181a22] border border-[#22242c] hover:border-blue-500 text-left text-white transition-colors"
             >
               [MACRO 2] » "Check stock of tomatoes"
             </button>
             <button
               onClick={() => triggerSample('Find supplier for beans')}
-              className="p-2 bg-[#14141a] hover:bg-[#1f1f28] border border-[#242430] hover:border-[#d2ff00] text-left text-white"
+              className="p-2 bg-[#121318] hover:bg-[#181a22] border border-[#22242c] hover:border-blue-500 text-left text-white transition-colors"
             >
               [MACRO 3] » "Who sells beans"
             </button>
             <button
               onClick={() => triggerSample('Switch to boda rider')}
-              className="p-2 bg-[#14141a] hover:bg-[#1f1f28] border border-[#242430] hover:border-[#d2ff00] text-left text-white"
+              className="p-2 bg-[#121318] hover:bg-[#181a22] border border-[#22242c] hover:border-blue-500 text-left text-white transition-colors"
             >
               [MACRO 4] » "Switch to Boda Dispatch"
             </button>
