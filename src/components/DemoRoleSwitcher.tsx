@@ -51,13 +51,20 @@ export function DemoRoleSwitcher() {
           <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between py-2 gap-2">
             {/* Left: Terminal Branding */}
             <div className="flex items-center justify-between gap-3">
-              <Link href="/" className="flex items-center gap-2 group">
-                <div className="px-1.5 h-6 bg-orange-600 text-white font-black flex items-center justify-center text-[10px] tracking-wider group-hover:bg-orange-500 transition-colors">
-                  KNS
+              <Link href="/" className="flex items-center gap-2.5 group">
+                <div className="relative w-8 h-8 rounded-md overflow-hidden border border-orange-200 shrink-0 bg-orange-50 shadow-2xs group-hover:border-orange-400 transition-colors">
+                  <img
+                    src="/icons/logo-square.png"
+                    alt="Kuja Na Supply Logo"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
-                <div className="flex items-center gap-2 font-bold tracking-tight">
-                  <span className="text-slate-900 text-sm font-black">KUJA NA SUPPLY</span>
-                  <span className="text-slate-400 text-[10px] hidden sm:inline">// NAIROBI_CORRIDOR_V2</span>
+                <div className="flex flex-col">
+                  <div className="flex items-center gap-1.5 font-bold tracking-tight leading-none">
+                    <span className="text-slate-900 text-sm font-black">KUJA NA SUPPLY</span>
+                    <span className="px-1 py-0.5 bg-orange-100 text-orange-700 text-[9px] font-black rounded-xs">KNS</span>
+                  </div>
+                  <span className="text-slate-400 text-[9px] hidden sm:inline leading-tight mt-0.5">NAIROBI LOGISTICS HUB</span>
                 </div>
               </Link>
 

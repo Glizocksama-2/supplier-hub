@@ -41,9 +41,13 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-[#f8fafc] text-slate-900 tactical-grid font-mono flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 selection:bg-orange-600 selection:text-white">
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center space-y-2">
-        <Link href="/" className="inline-flex items-center gap-2">
-          <div className="w-10 h-8 bg-orange-600 text-white font-black flex items-center justify-center text-xs tracking-wider">
-            KNS
+        <Link href="/" className="inline-flex items-center gap-2.5">
+          <div className="relative w-10 h-10 rounded-md overflow-hidden border border-orange-200 shrink-0 bg-orange-50 shadow-2xs">
+            <img
+              src="/icons/logo-square.png"
+              alt="Kuja Na Supply Logo"
+              className="w-full h-full object-cover"
+            />
           </div>
           <span className="text-xl font-black text-slate-900 uppercase tracking-tight">KUJA NA SUPPLY // OPS</span>
         </Link>

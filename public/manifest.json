@@ -4,8 +4,8 @@
   "description": "B2B commodity supply & boda dispatch platform connecting retailers, wholesalers, farmers, and boda riders across East Africa.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0a0a0c",
-  "theme_color": "#0a0a0c",
+  "background_color": "#f8fafc",
+  "theme_color": "#ea580c",
   "icons": [
     {
       "src": "/icons/icon-192.png",

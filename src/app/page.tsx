@@ -147,8 +147,12 @@ export default function HomePage() {
       <nav className="border-b border-slate-200 bg-white/95 backdrop-blur-md sticky top-0 z-40 shadow-xs">
         <div className="max-w-[1500px] mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-7 bg-orange-600 text-white font-black text-xs flex items-center justify-center tracking-wider">
-              KNS
+            <div className="relative w-8 h-8 rounded-md overflow-hidden border border-orange-200 shrink-0 bg-orange-50 shadow-2xs">
+              <img
+                src="/icons/logo-square.png"
+                alt="Kuja Na Supply Logo"
+                className="w-full h-full object-cover"
+              />
             </div>
             <span className="text-slate-900 font-black tracking-tight text-sm uppercase">
               KUJA NA SUPPLY // OPS HUD
@@ -174,38 +178,62 @@ export default function HomePage() {
 
       {/* Hero Section */}
       <main className="max-w-[1500px] mx-auto px-4 sm:px-6 py-12 md:py-16 space-y-12">
-        {/* Modern Clean Headline */}
-        <div className="space-y-4 max-w-5xl">
-          <div className="inline-flex items-center gap-2 border border-orange-200 bg-orange-50 px-2.5 py-1 text-[11px] text-orange-700 font-bold">
-            <Radio className="w-3.5 h-3.5 animate-pulse text-orange-600" />
-            <span>PWA LOGISTICS ENGINE // EAST AFRICA CORRIDOR</span>
+        {/* Modern Clean Headline with Mascot Showcase */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <div className="space-y-4 lg:col-span-8">
+            <div className="inline-flex items-center gap-2 border border-orange-200 bg-orange-50 px-2.5 py-1 text-[11px] text-orange-700 font-bold">
+              <Radio className="w-3.5 h-3.5 animate-pulse text-orange-600" />
+              <span>PWA LOGISTICS ENGINE // EAST AFRICA CORRIDOR</span>
+            </div>
+
+            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black text-slate-900 tracking-tighter uppercase leading-[0.95]">
+              DIRECT COMMODITY SUPPLY.
+              <br />
+              <span className="text-orange-600">INSTANT BODA DISPATCH.</span>
+            </h1>
+
+            <p className="text-slate-600 text-sm sm:text-base max-w-3xl leading-relaxed">
+              Eliminate broker fees. Connect informal kiosk retailers directly with bulk wholesalers and Limuru farm gates. Automated low-stock alarms, real-time Boda delivery routing, and hands-free voice orders.
+            </p>
+
+            <div className="pt-2 flex flex-wrap items-center gap-3">
+              <Link
+                href="/dashboard/retailer"
+                className="px-6 py-3.5 bg-orange-600 hover:bg-orange-500 text-white font-black text-xs uppercase tracking-wider flex items-center gap-2 shadow-md shadow-orange-600/20 transition-all hover:translate-x-0.5"
+              >
+                <span>[01 RETAILER KIOSK HUD]</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+              <Link
+                href="/dashboard/boda_rider"
+                className="px-6 py-3.5 bg-white hover:bg-orange-50 border border-slate-200 hover:border-orange-500 text-slate-800 font-black text-xs uppercase tracking-wider flex items-center gap-2 transition-all shadow-xs"
+              >
+                <span>[04 BODA DISPATCH RADAR]</span>
+                <ArrowRight className="w-4 h-4 text-orange-600" />
+              </Link>
+            </div>
           </div>
 
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black text-slate-900 tracking-tighter uppercase leading-[0.95]">
-            DIRECT COMMODITY SUPPLY.
-            <br />
-            <span className="text-orange-600">INSTANT BODA DISPATCH.</span>
-          </h1>
-
-          <p className="text-slate-600 text-sm sm:text-base max-w-3xl leading-relaxed">
-            Eliminate broker fees. Connect informal kiosk retailers directly with bulk wholesalers and Limuru farm gates. Automated low-stock alarms, real-time Boda delivery routing, and hands-free voice orders.
-          </p>
-
-          <div className="pt-2 flex flex-wrap items-center gap-3">
-            <Link
-              href="/dashboard/retailer"
-              className="px-6 py-3.5 bg-orange-600 hover:bg-orange-500 text-white font-black text-xs uppercase tracking-wider flex items-center gap-2 shadow-md shadow-orange-600/20 transition-all hover:translate-x-0.5"
-            >
-              <span>[01 RETAILER KIOSK HUD]</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-            <Link
-              href="/dashboard/boda_rider"
-              className="px-6 py-3.5 bg-white hover:bg-orange-50 border border-slate-200 hover:border-orange-500 text-slate-800 font-black text-xs uppercase tracking-wider flex items-center gap-2 transition-all shadow-xs"
-            >
-              <span>[04 BODA DISPATCH RADAR]</span>
-              <ArrowRight className="w-4 h-4 text-orange-600" />
-            </Link>
+          {/* Mascot Logo Card */}
+          <div className="lg:col-span-4 flex justify-center lg:justify-end">
+            <div className="bg-white border border-slate-200 p-3 shadow-sm rounded-xl max-w-xs w-full text-center space-y-2">
+              <div className="relative aspect-4/3 rounded-lg overflow-hidden border border-orange-100 bg-orange-50">
+                <img
+                  src="/logo.jpg"
+                  alt="Kuja Na Supply Delivery Boda"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="pt-1">
+                <div className="flex items-center justify-center gap-1.5 text-xs font-black text-slate-900 uppercase">
+                  <span className="w-2 h-2 bg-orange-500 rounded-full animate-ping" />
+                  <span>KUJA NA SUPPLY BODA FLEET</span>
+                </div>
+                <p className="text-[10px] text-slate-500 font-mono mt-0.5">
+                  ON-DEMAND CARGO COURIERS // 12-20 MIN ETA
+                </p>
+              </div>
+            </div>
           </div>
         </div>
 

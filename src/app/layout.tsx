@@ -9,6 +9,7 @@ const inconsolata = Inconsolata({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://supplier-hub-rouge.vercel.app'),
   title: 'KUJA NA SUPPLY // Nairobi B2B Supply & Boda Logistics Terminal',
   description: 'Industrial-grade PWA dispatch network connecting retailers, wholesalers, farmers, and boda riders across East Africa.',
   keywords: ['kuja na supply', 'nairobi supply chain', 'retailer kiosk', 'wholesaler', 'farmer', 'boda delivery', 'PWA'],
@@ -17,6 +18,11 @@ export const metadata: Metadata = {
     title: 'KUJA NA SUPPLY // B2B Terminal',
     description: 'Direct commodity supply & boda dispatch system for East Africa',
     type: 'website',
+    images: ['/logo.jpg'],
+  },
+  icons: {
+    icon: '/icons/icon-192.png',
+    apple: '/icons/icon-192.png',
   },
 }
 
