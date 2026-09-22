@@ -147,11 +147,11 @@ export default function HomePage() {
       <nav className="border-b border-[#22242c] bg-[#0c0d10]/95 backdrop-blur-md sticky top-0 z-40">
         <div className="max-w-[1500px] mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-7 h-7 bg-blue-600 text-white font-black text-sm flex items-center justify-center">
-              SH
+            <div className="w-8 h-7 bg-blue-600 text-white font-black text-xs flex items-center justify-center tracking-wider">
+              KNS
             </div>
             <span className="text-white font-black tracking-tight text-sm uppercase">
-              SUPPLIER HUB // OPS HUD
+              KUJA NA SUPPLY // OPS HUD
             </span>
           </div>
 
@@ -513,7 +513,7 @@ export default function HomePage() {
 
         {/* Quick Demo Footer */}
         <footer className="pt-8 border-t border-[#20222a] flex flex-col sm:flex-row items-center justify-between text-xs text-[#616572] gap-4">
-          <p>© 2026 SUPPLIER HUB // NAIROBI LOGISTICS CORRIDOR. BUILT FOR INFORMAL ECONOMIES.</p>
+          <p>© 2026 KUJA NA SUPPLY // NAIROBI LOGISTICS CORRIDOR. BUILT FOR INFORMAL ECONOMIES.</p>
           <div className="flex items-center gap-4">
             <Link href="/dashboard/retailer" className="hover:text-white">RETAILER</Link>
             <Link href="/dashboard/wholesaler" className="hover:text-white">WHOLESALER</Link>

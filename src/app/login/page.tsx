@@ -42,10 +42,10 @@ export default function LoginPage() {
     <div className="min-h-screen bg-[#0a0a0c] text-[#e2e4e9] tactical-grid font-mono flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 selection:bg-blue-600 selection:text-white">
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center space-y-2">
         <Link href="/" className="inline-flex items-center gap-2">
-          <div className="w-8 h-8 bg-blue-600 text-white font-black flex items-center justify-center text-sm">
-            SH
+          <div className="w-10 h-8 bg-blue-600 text-white font-black flex items-center justify-center text-xs tracking-wider">
+            KNS
           </div>
-          <span className="text-xl font-black text-white uppercase tracking-tight">SUPPLIER HUB // OPS</span>
+          <span className="text-xl font-black text-white uppercase tracking-tight">KUJA NA SUPPLY // OPS</span>
         </Link>
         <p className="text-xs text-[#9497a1] uppercase tracking-wider">
           AUTHENTICATE TERMINAL SESSION // NAIROBI NETWORK
@@ -126,7 +126,7 @@ export default function LoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="operator@supplierhub.co.ke"
+                placeholder="operator@kujanasupply.co.ke"
                 className="w-full bg-[#090a0d] border border-[#22242c] text-white py-2 px-3 font-mono font-bold"
               />
             </div>

@@ -52,11 +52,11 @@ export function DemoRoleSwitcher() {
             {/* Left: Terminal Branding */}
             <div className="flex items-center justify-between gap-3">
               <Link href="/" className="flex items-center gap-2 group">
-                <div className="w-6 h-6 bg-blue-600 text-white font-black flex items-center justify-center text-xs group-hover:bg-blue-500 transition-colors">
-                  SH
+                <div className="px-1.5 h-6 bg-blue-600 text-white font-black flex items-center justify-center text-[10px] tracking-wider group-hover:bg-blue-500 transition-colors">
+                  KNS
                 </div>
                 <div className="flex items-center gap-2 font-bold tracking-tight">
-                  <span className="text-white text-sm">SUPPLIER-HUB</span>
+                  <span className="text-white text-sm">KUJA NA SUPPLY</span>
                   <span className="text-[#616572] text-[10px] hidden sm:inline">// NAIROBI_CORRIDOR_V2</span>
                 </div>
               </Link>

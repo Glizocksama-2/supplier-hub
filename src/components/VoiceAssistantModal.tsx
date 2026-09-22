@@ -129,7 +129,7 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
               notes: 'Tactical Voice HUD requisition',
             })
 
-            const reply = `Order SH-${order.id.slice(-4)} logged. Sourced ${qty} ${product.unit} ${product.name} from ${best.supplier?.business_name} at KSh ${best.price_per_unit}/${product.unit}. Total invoice KSh ${order.total_amount.toLocaleString()}. Boda dispatch broadcast initiated.`
+            const reply = `Order ${order.id} logged. Sourced ${qty} ${product.unit} ${product.name} from ${best.supplier?.business_name} at KSh ${best.price_per_unit}/${product.unit}. Total invoice KSh ${order.total_amount.toLocaleString()}. Boda dispatch broadcast initiated.`
             setResponseMessage(reply)
             speakText(reply)
             return

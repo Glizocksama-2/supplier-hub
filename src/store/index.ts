@@ -77,9 +77,9 @@ export const DEMO_PROFILES: Record<UserRole, Profile> = {
     id: 'user-admin-1',
     role: 'admin',
     full_name: 'System Admin',
-    email: 'admin@supplierhub.co.ke',
+    email: 'admin@kujanasupply.co.ke',
     phone: '+254 700 000 000',
-    business_name: 'Supplier Hub Central Operations',
+    business_name: 'Kuja Na Supply Central Operations',
     location: null,
     address: 'Nairobi Central',
     is_verified: true,
@@ -607,7 +607,7 @@ export const useAppStore = create<AppState>()(
         const supplier = DEMO_PROFILES[supplierId.includes('farmer') ? 'farmer' : 'wholesaler'] || listing?.supplier
 
         const newOrder: Order = {
-          id: `SH-${Date.now().toString().slice(-4)}`,
+          id: `KNS-${Date.now().toString().slice(-4)}`,
           retailer_id: state.currentUser.id,
           supplier_id: supplierId,
           product_id: productId,
@@ -921,7 +921,7 @@ export const useAppStore = create<AppState>()(
       },
     }),
     {
-      name: 'supplier-hub-master-store',
+      name: 'kuja-na-supply-master-store',
     }
   )
 )

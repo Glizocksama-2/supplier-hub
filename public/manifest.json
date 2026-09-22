@@ -1,11 +1,11 @@
 {
-  "name": "Supplier Hub PWA",
-  "short_name": "SupplierHub",
-  "description": "B2B supply platform connecting retailers, wholesalers, farmers, and boda riders across East Africa.",
+  "name": "Kuja Na Supply PWA",
+  "short_name": "KujaNaSupply",
+  "description": "B2B commodity supply & boda dispatch platform connecting retailers, wholesalers, farmers, and boda riders across East Africa.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#22c55e",
+  "background_color": "#0a0a0c",
+  "theme_color": "#0a0a0c",
   "icons": [
     {
       "src": "/icons/icon-192.png",
