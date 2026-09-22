@@ -457,19 +457,19 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-xs p-4 font-mono">
-      <div className="relative w-full max-w-xl bg-[#0a0a0d] border-2 border-[#262832] text-[#e2e4e9] shadow-2xl p-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4 font-mono">
+      <div className="relative w-full max-w-xl bg-white border border-slate-200 text-slate-900 shadow-2xl p-6">
         {/* Terminal Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-[#22242b]">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-200">
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 bg-blue-600" />
-            <span className="text-xs font-black tracking-widest text-white uppercase">
+            <span className="w-2.5 h-2.5 bg-orange-600 rounded-full" />
+            <span className="text-xs font-black tracking-widest text-slate-900 uppercase">
               VOICE DISPATCH TERMINAL // AUDIO_INPUT_01
             </span>
           </div>
           <button
             onClick={onClose}
-            className="text-[#9497a1] hover:text-white px-2 py-1 text-xs font-bold border border-[#22242b] hover:border-[#383b48]"
+            className="text-slate-400 hover:text-slate-700 px-2 py-1 text-xs font-bold border border-slate-200 hover:border-slate-300 rounded-xs"
           >
             [ESC / CLOSE]
           </button>
@@ -477,9 +477,9 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
 
         {/* Audio Visualizer & Frequency Simulation */}
         <div className="py-6 flex flex-col items-center justify-center">
-          <div className="w-full bg-[#050608] border border-[#1e2028] p-4 mb-5">
-            <div className="flex items-center justify-between text-[10px] text-[#9497a1] pb-2 border-b border-[#181a22] mb-3">
-              <span>INPUT STATUS: <strong className={status === 'LISTENING' ? 'text-blue-400' : 'text-white'}>[{status}]</strong></span>
+          <div className="w-full bg-slate-50 border border-slate-200 p-4 mb-5">
+            <div className="flex items-center justify-between text-[10px] text-slate-500 pb-2 border-b border-slate-200 mb-3">
+              <span>INPUT STATUS: <strong className={status === 'LISTENING' ? 'text-orange-600' : 'text-slate-900'}>[{status}]</strong></span>
               <span>AUDIO ENGINE: ELEVENLABS NEURAL // MULTILINGUAL</span>
               <span>LOC: NAIROBI_CORRIDOR</span>
             </div>
@@ -491,8 +491,8 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
                   key={i}
                   className={`w-full transition-all duration-100 ${
                     isListening || isSpeaking
-                      ? 'bg-blue-500'
-                      : 'bg-[#1e2028]'
+                      ? 'bg-orange-500'
+                      : 'bg-slate-200'
                   }`}
                   style={{
                     height: isListening || isSpeaking ? `${Math.max(12, Math.round(h * Math.random()))}%` : '8%',
@@ -504,12 +504,12 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
 
           <button
             onClick={isListening ? stopListening : startListening}
-            className={`w-full py-4 border text-sm font-black tracking-widest uppercase transition-all flex items-center justify-center gap-3 ${
+            className={`w-full py-4 border text-sm font-black tracking-widest uppercase transition-all flex items-center justify-center gap-3 shadow-xs ${
               isListening
-                ? 'bg-blue-700 text-white border-blue-500'
+                ? 'bg-orange-700 text-white border-orange-600'
                 : isSpeaking
-                ? 'bg-blue-950/60 text-blue-300 border-blue-500'
-                : 'bg-blue-600 hover:bg-blue-500 text-white border-blue-600'
+                ? 'bg-orange-50 text-orange-700 border-orange-300'
+                : 'bg-orange-600 hover:bg-orange-700 text-white border-orange-600'
             }`}
           >
             {isListening ? (
@@ -519,7 +519,7 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
               </>
             ) : isSpeaking ? (
               <>
-                <Volume2 className="w-5 h-5 animate-bounce text-blue-400" />
+                <Volume2 className="w-5 h-5 animate-bounce text-orange-600" />
                 <span>[TRANSMITTING AUDIO TELEMETRY]</span>
               </>
             ) : (
@@ -535,46 +535,46 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
             <button
               type="button"
               onClick={() => triggerSample('Who is cheaper and faster for maize?')}
-              className="py-2 px-3 bg-[#101726] hover:bg-[#162238] border border-blue-600/60 hover:border-blue-500 text-blue-300 font-bold text-[10px] uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors"
+              className="py-2 px-3 bg-orange-50 hover:bg-orange-100 border border-orange-200 text-orange-800 font-bold text-[10px] uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors"
             >
-              <Volume2 className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+              <Volume2 className="w-3.5 h-3.5 text-orange-600 shrink-0" />
               <span className="truncate">▶ PLAY BELLA: SOURCING RADAR</span>
             </button>
             <button
               type="button"
               onClick={() => triggerSample('Order 50kg maize from cheapest supplier')}
-              className="py-2 px-3 bg-[#111318] hover:bg-[#181a22] border border-[#262834] hover:border-blue-500 text-white font-bold text-[10px] uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors"
+              className="py-2 px-3 bg-slate-50 hover:bg-slate-100 border border-slate-200 hover:border-orange-400 text-slate-800 font-bold text-[10px] uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors"
             >
-              <Volume2 className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+              <Volume2 className="w-3.5 h-3.5 text-orange-600 shrink-0" />
               <span className="truncate">▶ PLAY BELLA: REQUISITION</span>
             </button>
           </div>
 
           {/* Dedicated Brave / Edge Speech Diagnosis Card */}
           {speechError === 'network' && (
-            <div className="w-full mt-3 p-3 bg-[#0d111a] border border-blue-600/80 text-left font-mono">
-              <div className="flex items-center justify-between pb-1.5 border-b border-[#1e2330] mb-2">
-                <span className="text-xs font-bold text-white flex items-center gap-1.5">
-                  <span className="w-2 h-2 bg-blue-500 rounded-full animate-ping" />
+            <div className="w-full mt-3 p-3 bg-orange-50/70 border border-orange-300 text-left font-mono">
+              <div className="flex items-center justify-between pb-1.5 border-b border-orange-200 mb-2">
+                <span className="text-xs font-bold text-orange-950 flex items-center gap-1.5">
+                  <span className="w-2 h-2 bg-orange-600 rounded-full animate-ping" />
                   BRAVE / EDGE PRIVACY SHIELD DETECTED
                 </span>
-                <span className="text-[10px] text-blue-400 font-mono">ERR: NET_SPEECH_BLOCKED</span>
+                <span className="text-[10px] text-orange-700 font-mono font-bold">ERR: NET_SPEECH_BLOCKED</span>
               </div>
-              <p className="text-[11px] text-[#9ca3af] mb-2 leading-relaxed">
+              <p className="text-[11px] text-slate-700 mb-2 leading-relaxed">
                 Brave blocks Google Speech Cloud recognition by default. To enable your microphone:
               </p>
-              <div className="bg-[#050608] p-2 border border-[#222530] text-[11px] space-y-1 mb-2">
-                <div className="text-white">
-                  1. Open tab: <code className="text-blue-400 underline select-all bg-[#12151f] px-1 py-0.5">brave://settings/system</code>
+              <div className="bg-white p-2 border border-orange-200 text-[11px] space-y-1 mb-2">
+                <div className="text-slate-900">
+                  1. Open tab: <code className="text-orange-700 underline select-all bg-orange-50 px-1 py-0.5 border border-orange-100">brave://settings/system</code>
                 </div>
-                <div className="text-white">
-                  2. Turn <strong className="text-blue-400">ON</strong>: "Use Google services for speech recognition"
+                <div className="text-slate-900">
+                  2. Turn <strong className="text-orange-700">ON</strong>: "Use Google services for speech recognition"
                 </div>
-                <div className="text-[#9ca3af]">
+                <div className="text-slate-600">
                   3. Refresh this page & tap microphone to stream speech!
                 </div>
               </div>
-              <p className="text-[10px] text-blue-300">
+              <p className="text-[10px] text-orange-800 font-semibold">
                 ⚡ Or type any voice command in the box below and press Enter — Bella will synthesize audio immediately!
               </p>
             </div>
@@ -593,19 +593,19 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
             className="w-full mt-3 flex items-center gap-2"
           >
             <div className="relative flex-1">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-500 font-bold text-xs">»</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-orange-600 font-bold text-xs">»</span>
               <input
                 ref={inputRef}
                 type="text"
                 value={manualCommand}
                 onChange={(e) => setManualCommand(e.target.value)}
                 placeholder="TYPE VOICE COMMAND (e.g. 'Order 50kg maize', 'Who is cheaper?')..."
-                className="w-full bg-[#111318] border border-[#262834] focus:border-blue-500 text-white pl-7 pr-3 py-2.5 text-xs font-mono placeholder:text-[#525666] outline-none transition-colors"
+                className="w-full bg-slate-50 border border-slate-300 focus:border-orange-500 focus:bg-white text-slate-900 pl-7 pr-3 py-2.5 text-xs font-mono placeholder:text-slate-400 outline-none transition-colors"
               />
             </div>
             <button
               type="submit"
-              className="px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-black text-xs uppercase tracking-wider transition-colors shrink-0"
+              className="px-4 py-2.5 bg-orange-600 hover:bg-orange-700 text-white font-black text-xs uppercase tracking-wider transition-colors shrink-0 shadow-xs"
             >
               TRANSMIT »
             </button>
@@ -613,17 +613,17 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
 
           {/* Transcript telemetry */}
           {transcript && (
-            <div className="w-full mt-4 p-3 bg-[#111318] border border-[#222530] text-left">
-              <span className="text-[10px] text-blue-400 uppercase block mb-0.5">» RECOGNIZED PHRASE:</span>
-              <p className="text-xs font-bold text-white">"{transcript}"</p>
+            <div className="w-full mt-4 p-3 bg-slate-50 border border-slate-200 text-left">
+              <span className="text-[10px] text-orange-600 uppercase block mb-0.5 font-bold">» RECOGNIZED PHRASE:</span>
+              <p className="text-xs font-bold text-slate-900">"{transcript}"</p>
             </div>
           )}
 
           {/* Response Telemetry */}
           {responseMessage && (
-            <div className="w-full mt-3 p-3 bg-[#0a101d] border border-blue-800/60 text-left">
-              <span className="text-[10px] text-blue-400 uppercase block mb-0.5">» SYSTEM DISPATCH CONFIRMATION:</span>
-              <p className="text-xs font-semibold text-white leading-relaxed">
+            <div className="w-full mt-3 p-3 bg-orange-50/60 border border-orange-200 text-left">
+              <span className="text-[10px] text-orange-700 uppercase block mb-0.5 font-bold">» SYSTEM DISPATCH CONFIRMATION:</span>
+              <p className="text-xs font-semibold text-slate-900 leading-relaxed">
                 {responseMessage}
               </p>
             </div>
@@ -631,32 +631,32 @@ export function VoiceAssistantModal({ isOpen, onClose }: VoiceAssistantProps) {
         </div>
 
         {/* Demo Fast Triggers */}
-        <div className="pt-3 border-t border-[#1e2028]">
-          <span className="text-[10px] text-[#616572] uppercase block mb-2 font-bold">
+        <div className="pt-3 border-t border-slate-200">
+          <span className="text-[10px] text-slate-500 uppercase block mb-2 font-bold">
             // HARDWARE TRIGGER MACROS (TEST WITHOUT MICROPHONE):
           </span>
           <div className="grid grid-cols-2 gap-2 text-[11px]">
             <button
               onClick={() => triggerSample('Order 50kg maize from cheapest supplier')}
-              className="p-2 bg-[#121318] hover:bg-[#181a22] border border-[#22242c] hover:border-blue-500 text-left text-white transition-colors"
+              className="p-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 hover:border-orange-500 text-left text-slate-800 transition-colors font-medium"
             >
               [MACRO 1] » "Order 50kg maize"
             </button>
             <button
               onClick={() => triggerSample('Check stock of tomatoes')}
-              className="p-2 bg-[#121318] hover:bg-[#181a22] border border-[#22242c] hover:border-blue-500 text-left text-white transition-colors"
+              className="p-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 hover:border-orange-500 text-left text-slate-800 transition-colors font-medium"
             >
               [MACRO 2] » "Check stock of tomatoes"
             </button>
             <button
               onClick={() => triggerSample('Find supplier for beans')}
-              className="p-2 bg-[#121318] hover:bg-[#181a22] border border-[#22242c] hover:border-blue-500 text-left text-white transition-colors"
+              className="p-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 hover:border-orange-500 text-left text-slate-800 transition-colors font-medium"
             >
               [MACRO 3] » "Who sells beans"
             </button>
             <button
               onClick={() => triggerSample('Who is cheaper and faster for maize?')}
-              className="p-2 bg-[#0c1322] hover:bg-[#121c32] border border-blue-600 hover:border-blue-400 text-left text-white transition-colors col-span-2"
+              className="p-2 bg-orange-50 hover:bg-orange-100 border border-orange-300 hover:border-orange-500 text-left text-orange-950 transition-colors col-span-2 font-bold"
             >
               [★ SMART RADAR] » "Who is cheaper and faster for maize?"
             </button>
